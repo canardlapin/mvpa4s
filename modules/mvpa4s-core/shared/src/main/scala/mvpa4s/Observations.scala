@@ -70,7 +70,7 @@ final case class EvidenceIdentity(
     * erasing the independently retained source and provenance declarations.
     * This binds declared evidence; it does not verify payload contents.
     */
-  private[mvpa4s] def writeFramed(writer: AxisDigest.Writer): Unit =
+  def writeFramed(writer: AxisDigest.Writer): Unit =
     writer.string("scalafim.mvpa.evidence-identity.v1")
     writer.string(rows.stableKey)
     writer.string(columns.stableKey)

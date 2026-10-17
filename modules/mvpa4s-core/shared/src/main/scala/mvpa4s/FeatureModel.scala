@@ -73,32 +73,41 @@ final case class FeatureModelPrediction(
   require(items.length == predicted.rows, "prediction item count must match rows")
   require(targetNames.length == predicted.cols, "prediction target name count must match columns")
 
-private[mvpa4s] final case class StandardizedRidgeMap(
-    sourceMeans: Array[Double],
-    sourceScales: Array[Double],
-    targetMeans: Array[Double],
-    targetScales: Array[Double],
-    coefficients: DMat
+/** A fitted standardized ridge map. Construct with `fit`; the standardization
+  * state is private and the coefficient matrix is immutable.
+  */
+final class StandardizedRidgeMap private[mvpa4s] (
+    private val sourceMeanValues: Array[Double],
+    private val sourceScaleValues: Array[Double],
+    private val targetMeanValues: Array[Double],
+    private val targetScaleValues: Array[Double],
+    val coefficients: DMat
 ):
+  /** Training-fold standardization, as immutable copies. */
+  def sourceMeans: Vector[Double] = sourceMeanValues.toVector
+  def sourceScales: Vector[Double] = sourceScaleValues.toVector
+  def targetMeans: Vector[Double] = targetMeanValues.toVector
+  def targetScales: Vector[Double] = targetScaleValues.toVector
+
   def predict(source: DMat): Either[MvpaError, DMat] =
-    if source.cols != sourceMeans.length then
-      Left(MvpaError.InvalidFeatureModelInput(s"prediction source column count ${source.cols} != fitted source column count ${sourceMeans.length}"))
+    if source.cols != sourceMeanValues.length then
+      Left(MvpaError.InvalidFeatureModelInput(s"prediction source column count ${source.cols} != fitted source column count ${sourceMeanValues.length}"))
     else
       validateFinite(source, "feature model prediction source").map { _ =>
-        val standardized = StandardizedRidgeMap.standardize(source, sourceMeans, sourceScales)
+        val standardized = StandardizedRidgeMap.standardize(source, sourceMeanValues, sourceScaleValues)
         val predicted = standardized * coefficients
         val out = Matrix.newBuilder(predicted.rows, predicted.cols)
         var row = 0
         while row < predicted.rows do
           var col = 0
           while col < predicted.cols do
-            out(row, col) = predicted(row, col) * targetScales(col) + targetMeans(col)
+            out(row, col) = predicted(row, col) * targetScaleValues(col) + targetMeanValues(col)
             col += 1
           row += 1
         out.result()
       }
 
-private[mvpa4s] object StandardizedRidgeMap:
+object StandardizedRidgeMap:
   def fit(source: DMat, target: DMat, lambda: Double): Either[MvpaError, StandardizedRidgeMap] =
     if source.rows != target.rows then Left(MvpaError.InvalidFeatureModelInput(s"source rows ${source.rows} != target rows ${target.rows}"))
     else if source.rows < 2 then Left(MvpaError.InvalidFeatureModelInput("ridge feature model requires at least two training rows"))
@@ -112,7 +121,7 @@ private[mvpa4s] object StandardizedRidgeMap:
         targetStats <- ColumnStats.from(target)
         coefficients <- solve(source, target, sourceStats, targetStats, lambda)
       yield
-        StandardizedRidgeMap(
+        new StandardizedRidgeMap(
           sourceStats.means,
           sourceStats.scales,
           targetStats.means,
@@ -144,7 +153,7 @@ private[mvpa4s] object StandardizedRidgeMap:
       .map(error => MvpaError.InvalidFeatureModelInput(s"ridge solve failed: ${error.getMessage}"))
       .flatMap(_.solve(xty).left.map(error => MvpaError.InvalidFeatureModelInput(s"ridge solve failed: ${error.getMessage}")))
 
-  def standardize(matrix: DMat, means: Array[Double], scales: Array[Double]): DMat =
+  private[mvpa4s] def standardize(matrix: DMat, means: Array[Double], scales: Array[Double]): DMat =
     val out = Matrix.newBuilder(matrix.rows, matrix.cols)
     var row = 0
     while row < matrix.rows do
@@ -218,7 +227,7 @@ final case class FeatureModelMetricSet(
       )
     )
 
-private[mvpa4s] object FeatureModelMetrics:
+object FeatureModelMetrics:
   def compute(prediction: FeatureModelPrediction): Either[MvpaError, FeatureModelMetricSet] =
     val predicted = prediction.predicted
     val observed = prediction.observed

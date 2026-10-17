@@ -55,7 +55,8 @@ enum EvidenceOrigins:
   def reindexOutput(outputAxis: AxisDescriptor): EvidenceOrigins =
     reindexOutput(outputAxis, None)
 
-  private[mvpa4s] def reindexOutput(
+  /** Reindex the output association and declare the derived output values. */
+  def reindexOutput(
       outputAxis: AxisDescriptor,
       outputValues: ValueIdentity
   ): EvidenceOrigins =
@@ -73,7 +74,7 @@ enum EvidenceOrigins:
     * scientific-identity digest. Consumers that frame `EvidenceIdentity`
     * manually must call this rather than collapsing support to a display key.
     */
-  private[mvpa4s] def writeFramed(writer: AxisDigest.Writer): Unit =
+  def writeFramed(writer: AxisDigest.Writer): Unit =
     this match
       case Unknown => writer.string("unknown")
       case Bounded(value) =>
@@ -87,7 +88,7 @@ enum EvidenceOrigins:
         EvidenceOrigins.writePreparation(writer, value.preparation)
         writer.string(value.outputAxis.coordinateSignature.value)
 
-  private[mvpa4s] def identityDigest: String =
+  def identityDigest: String =
     AxisDigest.sha256Hex: writer =>
       writer.string("scalafim.mvpa.evidence-origins.v1")
       writeFramed(writer)

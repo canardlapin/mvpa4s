@@ -1,7 +1,7 @@
 package mvpa4s
 
 /** Bounded allocation evidence, not a timing benchmark or an automated gate.
-  * Run with mvpaJVM/Test/runMain mvpa4s.RsaAllocationProbe.
+  * Run with coreJVM/Test/runMain mvpa4s.RsaAllocationProbe.
   */
 object RsaAllocationProbe:
   @volatile private var sink = 0.0

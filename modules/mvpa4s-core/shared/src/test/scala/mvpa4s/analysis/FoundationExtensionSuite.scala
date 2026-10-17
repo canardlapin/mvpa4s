@@ -7,7 +7,7 @@ import resample4s.designs.KFold
 import mvpa4s.*
 import mvpa4s.measurement.*
 import mvpa4s.relation.*
-import scalafim.scenarios.{ScenarioHarness, ScenarioResult, ScenarioTolerance}
+import mvpa4s.testkit.{ScenarioHarness, ScenarioResult, ScenarioTolerance}
 import locus4s.provenance.{Provenance, ProvenanceId, SourceId}
 
 /** A method-local extension rehearsal on the physically retired foundation.

@@ -7,7 +7,7 @@ import resample4s.core.DigestAlgorithm
 import mvpa4s.*
 import mvpa4s.pattern.*
 import locus4s.provenance.{Provenance, ProvenanceId, SourceId}
-import scalafim.scenarios.{ScenarioHarness, ScenarioResult, ScenarioTolerance}
+import mvpa4s.testkit.{ScenarioHarness, ScenarioResult, ScenarioTolerance}
 
 class PatternTrainingStabilitySuite extends munit.FunSuite:
   given DigestAlgorithm = DigestAlgorithm.fnv1a64

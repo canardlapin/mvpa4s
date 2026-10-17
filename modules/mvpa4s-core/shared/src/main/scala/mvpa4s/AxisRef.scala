@@ -1,10 +1,9 @@
 package mvpa4s
 
-import locus4s.{DomainResolution, FiniteSpace, Index}
+import locus4s.{DomainError, DomainId, DomainRecord, DomainRegistry, DomainResolution, DomainRestoreError, FiniteSpace, Index}
 import locus4s.provenance.ProvenanceSink
 import multivar.core.{MultivarError, SemanticError, SemanticSpace, SpaceEvidence, SpaceRef, SpaceRole}
 import resample4s.core.{DesignError, DigestError, DomainMismatch, FingerprintError, UnknownUnit}
-import scalafim.locus.{DomainFactory, DomainFactoryError}
 
 enum EvidenceError:
   case InvalidAxis(field: String, detail: String)
@@ -14,7 +13,8 @@ enum EvidenceError:
   case InvalidSource(detail: String)
   case MultivarFailure(error: MultivarError)
   case SemanticFailure(error: SemanticError)
-  case LocusFailure(error: DomainFactoryError)
+  case LocusRecordFailure(error: DomainError)
+  case LocusRestoreFailure(error: DomainRestoreError)
   case ResampleFailure(error: DesignError)
   case ResampleDigestFailure(error: DigestError)
   case ResampleFingerprintFailure(error: FingerprintError)
@@ -38,7 +38,9 @@ enum EvidenceError:
         error.message
       case SemanticFailure(error) =>
         error.message
-      case LocusFailure(error) =>
+      case LocusRecordFailure(error) =>
+        error.message
+      case LocusRestoreFailure(error) =>
         error.message
       case ResampleFailure(error) =>
         error.message
@@ -387,13 +389,26 @@ object AxisRef:
         .of(descriptor.stableKey, descriptor.role, descriptor.size)
         .left
         .map(EvidenceError.MultivarFailure.apply)
-      domain <- DomainFactory
-        .restore(s"scalafim-mvpa-${descriptor.stableKey}", descriptor.size, Some(descriptor.namespace))
+      // Each axis restores an independent locus owner keyed by its content
+      // signature; equal axes align explicitly. The id string is persisted.
+      locusRecord <- DomainId
+        .parse(s"scalafim-mvpa-${descriptor.stableKey}")
+        .flatMap(DomainRecord.make(_, descriptor.namespace, descriptor.size))
         .left
-        .map(EvidenceError.LocusFailure.apply)
+        .map(EvidenceError.LocusRecordFailure.apply)
+      domain <- DomainRegistry.empty
+        .restore(locusRecord)
+        .left
+        .map(EvidenceError.LocusRestoreFailure.apply)
     yield new AxisRef(descriptor, index, record, semantic, domain)
 
-private[mvpa4s] object AxisDigest:
+/** The canonical framed SHA-256 writer behind every mvpa4s scientific identity.
+  *
+  * Fields are length-prefixed UTF-8 strings and little-endian counts. Consumers
+  * that bind their own identities to mvpa4s evidence frame them with this writer
+  * so digests compose byte-for-byte; the writer only appends.
+  */
+object AxisDigest:
   def sha256Hex(write: Writer => Unit): String =
     val writer = Writer()
     write(writer)
@@ -425,7 +440,7 @@ private[mvpa4s] object AxisDigest:
     def count(value: Int): Unit =
       intLE(value)
 
-    def digest(): Array[Byte] =
+    private[AxisDigest] def digest(): Array[Byte] =
       sha.digest()
 
   private final class Sha256:

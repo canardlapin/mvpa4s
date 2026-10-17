@@ -106,11 +106,37 @@ lazy val core =
 lazy val coreJVM = core.jvm
 lazy val coreJS = core.js
 
+// Test support for downstream suites: validated fixture identities and the R
+// parity reference data (checked against the core by this module's own tests).
+// Consumers depend on it in Test scope only.
+lazy val testkit =
+  crossProject(JSPlatform, JVMPlatform)
+    .crossType(CrossType.Full)
+    .in(file("modules/mvpa4s-testkit"))
+    .dependsOn(core)
+    .settings(commonSettings)
+    .settings(
+      name := "mvpa4s-testkit",
+      description := "Fixture identities and numerical parity reference data for tests of mvpa4s consumers."
+    )
+    .jsSettings(jsSettings)
+
+// An external consumer: it lives outside the `mvpa4s` package, so it compiles
+// only against the public API and cannot reach package-private members.
+lazy val consumer =
+  crossProject(JSPlatform, JVMPlatform)
+    .crossType(CrossType.Pure)
+    .in(file("examples/consumer"))
+    .dependsOn(core)
+    .settings(commonSettings)
+    .settings(name := "mvpa4s-consumer-example", publish / skip := true)
+    .jsSettings(jsSettings)
+
 lazy val root =
   project
     .in(file("."))
-    .aggregate(core.jvm, core.js)
+    .aggregate(core.jvm, core.js, testkit.jvm, testkit.js, consumer.jvm, consumer.js)
     .settings(name := "mvpa4s-root", publish / skip := true)
 
 addCommandAlias("mvpa4sCompileAll", ";root/compile;root/Test/compile")
-addCommandAlias("mvpa4sTestAll", ";coreJVM/test;coreJS/test")
+addCommandAlias("mvpa4sTestAll", ";coreJVM/test;coreJS/test;testkitJVM/test;testkitJS/test;consumerJVM/test;consumerJS/test")

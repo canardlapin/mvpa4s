@@ -1,5 +1,6 @@
 package mvpa4s
 
+import mvpa4s.reference.MvpaMigrationParityFixtures
 import gale.linalg.DMat
 
 class MvpaMigrationParitySuite extends munit.FunSuite:
@@ -59,7 +60,7 @@ class MvpaMigrationParitySuite extends munit.FunSuite:
 
   test("migration baseline failure policy remains typed"):
     val nonFinite = Rdm.squaredEuclidean(
-      GaleTestMatrix.fromRows(Vector(Vector(0.0), Vector(Double.NaN)))
+      DMat.dense(2, 1, Vector(0.0, Double.NaN))
     )
     assertEquals(
       nonFinite.left.toOption,

@@ -1,10 +1,15 @@
-package mvpa4s
+package mvpa4s.reference
 
+import mvpa4s.*
 import gale.linalg.DMat
 
 /** Constants generated independently by `tools/mvpa/generate_migration_parity.R`.
   */
 object MvpaMigrationParityFixtures:
+  private def matrixFromRows(rows: Seq[Seq[Double]]): DMat =
+    require(rows.nonEmpty && rows.forall(_.length == rows.head.length), "reference rows must be non-empty and rectangular")
+    DMat.dense(rows.length, rows.head.length, rows.flatten.toVector)
+
   val sourceRevision: String =
     "528c302e454697055bc9af31c9a6eca684f019e3"
 
@@ -68,7 +73,7 @@ object MvpaMigrationParityFixtures:
       )
 
     val scaledCentroids: DMat =
-      GaleTestMatrix.fromRows(
+      matrixFromRows(
         Vector(
           Vector(0.95266102324493385, -0.90879989664763949, -0.30860669992418382),
           Vector(-0.43663630232059469, 0.26671301314658985, 0.23145502494313785),
@@ -77,7 +82,7 @@ object MvpaMigrationParityFixtures:
       )
 
     val scaledTest: DMat =
-      GaleTestMatrix.fromRows(
+      matrixFromRows(
         Vector(
           Vector(0.39694209301872235, -0.35561735086211982, -0.23145502494313785),
           Vector(-0.99235523254680602, 1.0964868318248693, 0.92582009977255142),
@@ -87,7 +92,7 @@ object MvpaMigrationParityFixtures:
       )
 
     val scores: DMat =
-      GaleTestMatrix.fromRows(
+      matrixFromRows(
         Vector(
           Vector(-0.98889220304229875, -1.7321807602022148, -3.210483556730662),
           Vector(-3.9892366030974031, -0.47041088831903521, 0.028263171468814186),
@@ -97,7 +102,7 @@ object MvpaMigrationParityFixtures:
       )
 
     val probabilities: DMat =
-      GaleTestMatrix.fromRows(
+      matrixFromRows(
         Vector(
           Vector(0.63131955332372924, 0.3002224202666115, 0.068458026409659312),
           Vector(0.01107336402471612, 0.37366822393903626, 0.61525841203624765),
@@ -137,7 +142,7 @@ object MvpaMigrationParityFixtures:
       Vector("b", "a")
 
     val probabilities: DMat =
-      GaleTestMatrix.fromRows(
+      matrixFromRows(
         Vector(
           Vector(0.93360327508833352, 0.066396724911666483),
           Vector(0.041840832422621453, 0.95815916757737851),

@@ -149,7 +149,7 @@ object EstimandId:
 opaque type PlanId = String
 
 object PlanId:
-  private[analysis] def derived(
+  private[mvpa4s] def derived(
       estimand: EstimandId,
       sourceAxes: Vector[AxisSignature],
       designAxis: AxisSignature,

@@ -8,7 +8,7 @@ import resample4s.kernel.Seed
 import mvpa4s.*
 import mvpa4s.pattern.*
 import locus4s.provenance.{Provenance, ProvenanceId, SourceId}
-import scalafim.scenarios.{ScenarioHarness, ScenarioResult, ScenarioTolerance}
+import mvpa4s.testkit.{ScenarioHarness, ScenarioResult, ScenarioTolerance}
 
 class RankConfirmationSuite extends munit.FunSuite:
   private def right[A](value: Either[?, A]): A = value.fold(error => fail(error.toString), identity)

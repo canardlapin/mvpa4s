@@ -45,7 +45,8 @@ final case class TwoStagePatternFitPolicy(
 ):
   require(maximumResidualCells >= 0L)
 
-  private[mvpa4s] def identity: String = AxisDigest.sha256Hex: writer =>
+  /** Canonical digest of this policy, for binding it into consumer identities. */
+  def identity: String = AxisDigest.sha256Hex: writer =>
     writer.string("two-stage-pattern-policy-v1")
     writer.intLE(covariance.rank)
     writer.string(java.lang.Long.toString(maximumResidualCells))
