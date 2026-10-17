@@ -9,6 +9,9 @@ ThisBuild / scalaVersion := "3.7.4"
 ThisBuild / version := "0.1.0-SNAPSHOT"
 ThisBuild / versionScheme := Some("early-semver")
 ThisBuild / homepage := Some(url("https://github.com/canardlapin/mvpa4s"))
+ThisBuild / licenses := List(
+  "Apache-2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0.txt")
+)
 
 // Providers are immutable source pins. Each `mvpa4s.<provider>.build` property
 // is an explicit sibling-checkout override for coordinated development; a

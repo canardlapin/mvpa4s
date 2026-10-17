@@ -76,3 +76,7 @@ Fixture generators live under `tools/`; see
 
 The code was extracted from ScalaFIM (`canardlapin/scalafim`) at
 `33d8f46de63229920003ab17fbfbc9fe7f43b613`; earlier history lives there.
+
+## License
+
+Apache License 2.0; see [LICENSE](LICENSE).
