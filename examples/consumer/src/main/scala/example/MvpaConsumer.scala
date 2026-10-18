@@ -1,5 +1,6 @@
 package example
 
+import alder.kernel.{DataFingerprint, Example}
 import gale.linalg.DMat
 import gale.optim.{FirstOrderConfig, FirstOrderTolerance}
 import locus4s.provenance.{Provenance, ProvenanceId, SourceId}
@@ -23,6 +24,7 @@ import mvpa4s.pattern.{
   SupportPenalty,
   TwoStagePatternFitPolicy
 }
+import mvpa4s.predictive.NativeAxisMapping
 import mvpa4s.relation.{EffectEstimability, RelationOrigins, RelationSource, ScopeReplay}
 import resample4s.core.{Draw, IndexSpace, Injection}
 
@@ -130,3 +132,12 @@ object MvpaConsumer:
         .left
         .map(_.toString)
     yield TwoStagePatternFitPolicy(structured, covariance, 10000000L).identity
+
+  /** A downstream learner binds its own row type to declared native ids. */
+  def predictiveRows(axis: AxisRef[String]): Either[String, Vector[Long]] =
+    for
+      mapping <- NativeAxisMapping
+        .fromAxis(axis, Vector(900L, 901L, 902L), DataFingerprint.external("consumer"))
+        .left.map(_.toString)
+      rows <- mapping.identifiedRows((id, ordinal) => Example(ordinal, Array(id.toDouble), ())).left.map(_.toString)
+    yield rows.ids

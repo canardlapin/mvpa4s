@@ -66,10 +66,7 @@ object AlderOperatorRidge:
       _ <- if targets.length == mapping.axis.size then Right(()) else Left(AlderOperatorRidgeError.Admission(AlderPredictiveAdmissionError.MatrixShapeMismatch("targets", targets.length, 1, mapping.axis.size, 1)))
       required = targets.length.toLong
       _ <- if required <= budget.maximumCells then Right(()) else Left(AlderOperatorRidgeError.Budget(required, budget.maximumCells))
-      root <- alder.data.IdentifiedRows.fromRows(
-        mapping.nativeIds.zipWithIndex.map((id, ordinal) => id -> Example(AlderOperatorRidgeRow(id, ordinal), Array(targets(ordinal)), ())),
-        mapping.declaredMappingIdentity
-      ).left.map(error => AlderOperatorRidgeError.Admission(AlderPredictiveAdmissionError.ProviderFixedSelection(error.toString)))
+      root <- mapping.identifiedRows((id, ordinal) => Example(AlderOperatorRidgeRow(id, ordinal), Array(targets(ordinal)), ())).left.map(AlderOperatorRidgeError.Admission.apply)
     yield new AlderOperatorRidgeRows(root, mapping, operator, OperatorRidgeAdmissionReceipt(targets.length, required, budget.maximumCells), None)
 
   /** Admits simplex memberships without reading or materializing operator
@@ -80,10 +77,7 @@ object AlderOperatorRidge:
       _ <- if operator.samples == mapping.axis.size && membership.samples == mapping.axis.size then Right(()) else Left(AlderOperatorRidgeError.OperatorSampleCount(mapping.axis.size, operator.samples))
       required = membership.samples.toLong * membership.classCount.toLong
       _ <- if required <= budget.maximumCells then Right(()) else Left(AlderOperatorRidgeError.Budget(required, budget.maximumCells))
-      root <- alder.data.IdentifiedRows.fromRows(
-        mapping.nativeIds.zipWithIndex.map((id, ordinal) => id -> Example(AlderOperatorRidgeRow(id, ordinal), Array.tabulate(membership.classCount)(klass => membership.values(ordinal, klass)), ())),
-        mapping.declaredMappingIdentity
-      ).left.map(error => AlderOperatorRidgeError.Admission(AlderPredictiveAdmissionError.ProviderFixedSelection(error.toString)))
+      root <- mapping.identifiedRows((id, ordinal) => Example(AlderOperatorRidgeRow(id, ordinal), Array.tabulate(membership.classCount)(klass => membership.values(ordinal, klass)), ())).left.map(AlderOperatorRidgeError.Admission.apply)
     yield new AlderOperatorRidgeRows(root, mapping, operator, OperatorRidgeAdmissionReceipt(membership.samples, required, budget.maximumCells), Some(membership.classes))
 
   def crossValidate[S <: multivar.core.SemanticSpace, K](

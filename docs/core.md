@@ -12,7 +12,7 @@ import mvpa4s.*
 
 This module provides identified observation/response axes, measurement legs,
 relational estimands, structured pattern fits and portable numerical kernels.
-Predictive validation runs through the [native Alder adapters](https://github.com/canardlapin/scalafim/blob/main/modules/mvpa-dataset/README.md) (ScalaFIM integration).
+Predictive validation runs through the optional [Alder adapters](predictive.md) in `mvpa4s-predictive`.
 
 Dense categorical kernels fit `DMat` with `Vector[ClassLabel]` and return their
 concrete model. `model.predict(test)` returns validated `CategoricalProbabilities`;
@@ -21,9 +21,9 @@ from probabilities. Swift uses training-only sample-SD scaling; correlation
 requires at least two features. Operator ridge and soft LDA retain single-fit
 kernels and operator application/convergence receipts.
 
-Predictive orchestration has moved to `AlderSwiftCentroid`,
-`AlderCorrelationCentroid`, `AlderRidgeLda`, `AlderFeatureModel`,
-`AlderCrossDecoding`, `AlderOperatorRidge` and `AlderSoftLda`.
+Predictive orchestration lives in [`mvpa4s-predictive`](predictive.md):
+`AlderSwiftCentroid`, `AlderCorrelationCentroid`, `AlderRidgeLda`,
+`AlderFeatureModel`, `AlderCrossDecoding` and `AlderOperatorRidge`.
 Bind `ValidationDesign` to the actual sample axis and admit observations with
 `AlderPredictiveAdmission.nativeTables` or `.nativeMeasurement` before fitting.
 Regional/searchlight selection uses a typed `MeasurementFrame` rather than

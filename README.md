@@ -14,8 +14,9 @@ do not own:
 | Typed reindexing, resampling designs | [Resample4s](https://github.com/canardlapin/resample4s) |
 | Semantic multivariate algebra and inference | [Multivar](https://github.com/canardlapin/multivar) |
 | Dense/sparse matrices and solvers | [Gale](https://github.com/canardlapin/gale) |
+| Fit lifecycles, cross-fitting, fitted artifacts (predictive module only) | [Alder](https://github.com/canardlapin/alder) |
 
-The core has no imaging, surface, atlas, dataset or fMRI-fit dependency.
+The core has no Alder, imaging, surface, atlas, dataset or fMRI-fit dependency.
 Neuroimaging integrations live downstream (for example in ScalaFIM).
 
 ## Modules
@@ -23,6 +24,7 @@ Neuroimaging integrations live downstream (for example in ScalaFIM).
 | Artifact | Purpose |
 | --- | --- |
 | `mvpa4s-core` | axes, reindexing legs, evidence identity and origins, relations, pattern analyses, measurement and execution contracts |
+| `mvpa4s-predictive` | optional [Alder](https://github.com/canardlapin/alder) adapters: training-only preparation, held-out prediction, validation and tuning; see the [predictive guide](docs/predictive.md) |
 | `mvpa4s-testkit` | test-scope support for consumers: validated fixture identities and R parity reference data |
 
 ## Example
@@ -68,14 +70,20 @@ tools/prepare-pinned-dependencies.sh
 sbt mvpa4sCompileAll mvpa4sTestAll
 ```
 
+Alder currently pins an older Gale (`099832f`) than mvpa4s (`6f7a1f9`), so
+an ordinary build of `mvpa4s-predictive` carries both Gale source builds. Until
+Alder moves to the mvpa4s pin, pass `-Dmvpa4s.gale.build=<gale checkout at
+6f7a1f9>` when one Gale must resolve throughout; the core is unaffected.
+
 For coordinated provider work, `-Dmvpa4s.<provider>.build=<path>` (for example
 `-Dmvpa4s.locus4s.build=../locus4s`) substitutes a sibling checkout.
 
 Fixture generators live under `tools/`; see
 [`tools/r-parity/mvpa-fixtures.md`](tools/r-parity/mvpa-fixtures.md).
 
-The code was extracted from ScalaFIM (`canardlapin/scalafim`) at
-`33d8f46de63229920003ab17fbfbc9fe7f43b613`; earlier history lives there.
+The code was extracted from ScalaFIM (`canardlapin/scalafim`): the core at
+`33d8f46de63229920003ab17fbfbc9fe7f43b613` and the predictive module at
+`04065f526e276b8ececf4daf8e3c14c6e66e6ff2`; earlier history lives there.
 
 ## License
 

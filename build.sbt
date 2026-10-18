@@ -58,6 +58,8 @@ lazy val multivarInferenceJS = ProjectRef(multivarBuild, "inferenceJS")
 // Alder owns fit lifecycles, stage-aware cross-fitting and fitted artifacts;
 // only the optional predictive module depends on it. Alder's own provider
 // overrides take checkout paths, so path overrides given here are forwarded.
+// Alder pins Gale 099832f, older than galeRevision above; without a Gale path
+// override both builds load. See README "Development".
 lazy val alderRevision = "e555bad92307af1c2cbc104aef398cb9d9de88f0"
 lazy val alderBuild = {
   Seq("resample4s", "gale", "linop4s").foreach { provider =>
@@ -192,7 +194,7 @@ lazy val consumer =
   crossProject(JSPlatform, JVMPlatform)
     .crossType(CrossType.Pure)
     .in(file("examples/consumer"))
-    .dependsOn(core)
+    .dependsOn(core, predictive)
     .settings(commonSettings)
     .settings(name := "mvpa4s-consumer-example", publish / skip := true)
     .jsSettings(jsSettings)

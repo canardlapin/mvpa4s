@@ -33,6 +33,14 @@ final class NativeAxisMapping private (
         writer.string(entry.nativeId.toString)
     )
 
+  /** Binds one caller-built example to each native id, in ordinal order,
+    * under this mapping's declared identity. The binding fixes ids and order;
+    * the identity covers the declared mapping, not the example payloads. */
+  def identifiedRows[E](example: (Long, Int) => E): Either[AlderPredictiveAdmissionError, IdentifiedRows[E]] =
+    IdentifiedRows
+      .fromRows(nativeIds.zipWithIndex.map((id, ordinal) => id -> example(id, ordinal)), declaredMappingIdentity)
+      .left.map(error => AlderPredictiveAdmissionError.ProviderFixedSelection(error.toString))
+
 object NativeAxisMapping:
   def fromAxis[K](axis: AxisRef[K], nativeIdsByOrdinal: Vector[Long], declaredSource: DataFingerprint): Either[AlderPredictiveAdmissionError, NativeAxisMapping] =
     if nativeIdsByOrdinal.length != axis.size then Left(AlderPredictiveAdmissionError.NativeIdCountMismatch(axis.size, nativeIdsByOrdinal.length))
@@ -173,12 +181,11 @@ object AlderPredictiveAdmission:
       _ <- if targets.rows == axis.size && targets.cols > 0 then Right(()) else Left(AlderPredictiveAdmissionError.MatrixShapeMismatch("targets", targets.rows, targets.cols, axis.size, -1))
       _ <- if metadata.length == axis.size then Right(()) else Left(AlderPredictiveAdmissionError.MatrixShapeMismatch("metadata", metadata.length, 1, axis.size, 1))
       receipt <- MaterializationBudget.authorize(budget, axis.size, inputs.cols, targets.cols)
-      rows = Vector.tabulate(axis.size): row =>
-        mapping.entriesByOrdinal(row).nativeId -> Example(
+      root <- mapping.identifiedRows: (_, row) =>
+        Example(
           Array.tabulate(inputs.cols)(column => inputs(row, column)),
           Array.tabulate(targets.cols)(column => targets(row, column)), metadata(row)
         )
-      root <- IdentifiedRows.fromRows(rows, mapping.declaredMappingIdentity).left.map(error => AlderPredictiveAdmissionError.ProviderFixedSelection(error.toString))
     yield new AlderMaterializedRows(root, mapping, receipt)
 
   /** Materializes native tables only through an explicitly bounded complete
