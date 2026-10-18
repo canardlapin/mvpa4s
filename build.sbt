@@ -23,7 +23,7 @@ def pinned(provider: String, revision: String): URI =
     .map(path => file(path).getCanonicalFile.toURI)
     .getOrElse(uri(s"https://github.com/canardlapin/$provider.git#$revision"))
 
-lazy val galeRevision = "6f7a1f9509a07c2b3f5b956332d39a1bc5b64c3c"
+lazy val galeRevision = "779ed3d8169cdd9f4eb9ab10b1ca9defadc27715"
 lazy val galeBuild = pinned("gale", galeRevision)
 lazy val galeCoreJVM = ProjectRef(galeBuild, "coreJVM")
 lazy val galeCoreJS = ProjectRef(galeBuild, "coreJS")
@@ -45,7 +45,7 @@ lazy val locus4sProvenanceJS = ProjectRef(locus4sBuild, "locus4s-provenanceJS")
 // Multivar inference must share the same Resample4s classes as the MVPA core.
 // Its Gale and Resample4s artifacts are prepared by
 // tools/prepare-pinned-dependencies.sh.
-lazy val multivarRevision = "2bc14d14ba42a678fbbe169293153eddaba6175c"
+lazy val multivarRevision = "7afdeea290fdcc80b81a4126aa303f93a5348c0e"
 lazy val multivarBuild = {
   System.setProperty("multivar.resample4s.build.uri", resample4sBuild.toString)
   pinned("multivar", multivarRevision)
@@ -58,9 +58,9 @@ lazy val multivarInferenceJS = ProjectRef(multivarBuild, "inferenceJS")
 // Alder owns fit lifecycles, stage-aware cross-fitting and fitted artifacts;
 // only the optional predictive module depends on it. Alder's own provider
 // overrides take checkout paths, so path overrides given here are forwarded.
-// Alder pins Gale 099832f, older than galeRevision above; without a Gale path
-// override both builds load. See README "Development".
-lazy val alderRevision = "e555bad92307af1c2cbc104aef398cb9d9de88f0"
+// Its Gale pin must equal galeRevision; tools/prepare-pinned-dependencies.sh
+// checks this.
+lazy val alderRevision = "7618c715002b3912f856c4d44468ae173fce4dec"
 lazy val alderBuild = {
   Seq("resample4s", "gale", "linop4s").foreach { provider =>
     sys.props

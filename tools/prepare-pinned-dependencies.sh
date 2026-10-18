@@ -26,6 +26,18 @@ if [ "${#gale_revision}" -ne 40 ] || [ "$gale_revision" != "$multivar_gale_revis
   echo "Gale revision mismatch: mvpa4s=$gale_revision Multivar=$multivar_gale_revision" >&2
   exit 1
 fi
+# Alder (predictive module only) loads Gale from source at its own pin; the
+# same mixed-graph hazard applies, so its pin must match too.
+alder_revision=$(sed -n 's/^lazy val alderRevision = "\([0-9a-f]*\)".*/\1/p' "$repo_root/build.sbt")
+[ "${#alder_revision}" -eq 40 ] || { echo 'Invalid alderRevision in build.sbt' >&2; exit 1; }
+git clone --quiet --no-checkout --filter=blob:none \
+  https://github.com/canardlapin/alder.git "$provider_tmp/alder"
+git -C "$provider_tmp/alder" checkout --quiet --detach "$alder_revision"
+alder_gale_revision=$(sed -n '/^lazy val galeRevision =/{n;s/^ *"\([0-9a-f]*\)".*/\1/p;}' "$provider_tmp/alder/build.sbt")
+if [ "$gale_revision" != "$alder_gale_revision" ]; then
+  echo "Gale revision mismatch: mvpa4s=$gale_revision Alder=$alder_gale_revision" >&2
+  exit 1
+fi
 GALE_CACHE="$provider_tmp/gale" \
   "$provider_tmp/multivar/tools/publish-gale-local.sh"
 RESAMPLE4S_CACHE="$provider_tmp/resample4s" \

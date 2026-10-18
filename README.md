@@ -70,11 +70,6 @@ tools/prepare-pinned-dependencies.sh
 sbt mvpa4sCompileAll mvpa4sTestAll
 ```
 
-Alder currently pins an older Gale (`099832f`) than mvpa4s (`6f7a1f9`), so
-an ordinary build of `mvpa4s-predictive` carries both Gale source builds. Until
-Alder moves to the mvpa4s pin, pass `-Dmvpa4s.gale.build=<gale checkout at
-6f7a1f9>` when one Gale must resolve throughout; the core is unaffected.
-
 For coordinated provider work, `-Dmvpa4s.<provider>.build=<path>` (for example
 `-Dmvpa4s.locus4s.build=../locus4s`) substitutes a sibling checkout.
 
