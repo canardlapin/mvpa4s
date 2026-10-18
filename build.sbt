@@ -55,6 +55,31 @@ lazy val multivarJS = ProjectRef(multivarBuild, "coreJS")
 lazy val multivarInferenceJVM = ProjectRef(multivarBuild, "inferenceJVM")
 lazy val multivarInferenceJS = ProjectRef(multivarBuild, "inferenceJS")
 
+// Alder owns fit lifecycles, stage-aware cross-fitting and fitted artifacts;
+// only the optional predictive module depends on it. Alder's own provider
+// overrides take checkout paths, so path overrides given here are forwarded.
+lazy val alderRevision = "e555bad92307af1c2cbc104aef398cb9d9de88f0"
+lazy val alderBuild = {
+  Seq("resample4s", "gale", "linop4s").foreach { provider =>
+    sys.props
+      .get(s"mvpa4s.$provider.build")
+      .foreach(System.setProperty(s"alder.$provider.build", _))
+  }
+  pinned("alder", alderRevision)
+}
+lazy val alderKernelJVM = ProjectRef(alderBuild, "kernelJVM")
+lazy val alderKernelJS = ProjectRef(alderBuild, "kernelJS")
+lazy val alderDataJVM = ProjectRef(alderBuild, "dataJVM")
+lazy val alderDataJS = ProjectRef(alderBuild, "dataJS")
+lazy val alderModelsLinearJVM = ProjectRef(alderBuild, "modelsLinearJVM")
+lazy val alderModelsLinearJS = ProjectRef(alderBuild, "modelsLinearJS")
+lazy val alderRidgeGaleJVM = ProjectRef(alderBuild, "ridgeGaleJVM")
+lazy val alderRidgeGaleJS = ProjectRef(alderBuild, "ridgeGaleJS")
+lazy val alderTuneJVM = ProjectRef(alderBuild, "tuneJVM")
+lazy val alderTuneJS = ProjectRef(alderBuild, "tuneJS")
+lazy val alderMetricsJVM = ProjectRef(alderBuild, "metricsJVM")
+lazy val alderMetricsJS = ProjectRef(alderBuild, "metricsJS")
+
 lazy val commonSettings = Seq(
   scalacOptions ++= Seq(
     "-deprecation",
@@ -124,6 +149,43 @@ lazy val testkit =
     )
     .jsSettings(jsSettings)
 
+// Optional Alder adapters: training-only preparation, held-out prediction,
+// validation and tuning over mvpa4s evidence.
+lazy val predictive =
+  crossProject(JSPlatform, JVMPlatform)
+    .crossType(CrossType.Full)
+    .in(file("modules/mvpa4s-predictive"))
+    .dependsOn(core, testkit % Test)
+    .settings(commonSettings)
+    .settings(
+      name := "mvpa4s-predictive",
+      description := "Alder predictive adapters for identified mvpa4s evidence."
+    )
+    .jvmConfigure(
+      _.dependsOn(
+        alderKernelJVM,
+        alderDataJVM,
+        alderModelsLinearJVM,
+        alderRidgeGaleJVM,
+        alderTuneJVM,
+        alderMetricsJVM
+      )
+    )
+    .jsConfigure(
+      _.dependsOn(
+        alderKernelJS,
+        alderDataJS,
+        alderModelsLinearJS,
+        alderRidgeGaleJS,
+        alderTuneJS,
+        alderMetricsJS
+      )
+    )
+    .jsSettings(jsSettings)
+
+lazy val predictiveJVM = predictive.jvm
+lazy val predictiveJS = predictive.js
+
 // An external consumer: it lives outside the `mvpa4s` package, so it compiles
 // only against the public API and cannot reach package-private members.
 lazy val consumer =
@@ -138,8 +200,8 @@ lazy val consumer =
 lazy val root =
   project
     .in(file("."))
-    .aggregate(core.jvm, core.js, testkit.jvm, testkit.js, consumer.jvm, consumer.js)
+    .aggregate(core.jvm, core.js, testkit.jvm, testkit.js, predictive.jvm, predictive.js, consumer.jvm, consumer.js)
     .settings(name := "mvpa4s-root", publish / skip := true)
 
 addCommandAlias("mvpa4sCompileAll", ";root/compile;root/Test/compile")
-addCommandAlias("mvpa4sTestAll", ";coreJVM/test;coreJS/test;testkitJVM/test;testkitJS/test;consumerJVM/test;consumerJS/test")
+addCommandAlias("mvpa4sTestAll", ";coreJVM/test;coreJS/test;testkitJVM/test;testkitJS/test;predictiveJVM/test;predictiveJS/test;consumerJVM/test;consumerJS/test")
