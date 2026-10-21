@@ -25,6 +25,7 @@ Neuroimaging integrations live downstream (for example in ScalaFIM).
 | --- | --- |
 | `mvpa4s-core` | axes, reindexing legs, evidence identity and origins, relations, pattern analyses, measurement and execution contracts |
 | `mvpa4s-predictive` | optional [Alder](https://github.com/canardlapin/alder) adapters: training-only preparation, held-out prediction, validation and tuning; see the [predictive guide](docs/predictive.md) |
+| `mvpa4s-locus` | optional locus-domain region/selection measurements, centered neighborhoods, scatter and exact volume support graphs; no imaging or surface dependency |
 | `mvpa4s-testkit` | test-scope support for consumers: validated fixture identities and R parity reference data |
 
 ## Example

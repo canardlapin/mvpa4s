@@ -39,6 +39,8 @@ lazy val locus4sRevision = "e32b0aeba5c4d19c457b2329272b95b26c061943"
 lazy val locus4sBuild = pinned("locus4s", locus4sRevision)
 lazy val locus4sCoreJVM = ProjectRef(locus4sBuild, "locus4s-coreJVM")
 lazy val locus4sCoreJS = ProjectRef(locus4sBuild, "locus4s-coreJS")
+lazy val locus4sDataJVM = ProjectRef(locus4sBuild, "locus4s-dataJVM")
+lazy val locus4sDataJS = ProjectRef(locus4sBuild, "locus4s-dataJS")
 lazy val locus4sProvenanceJVM = ProjectRef(locus4sBuild, "locus4s-provenanceJVM")
 lazy val locus4sProvenanceJS = ProjectRef(locus4sBuild, "locus4s-provenanceJS")
 
@@ -188,6 +190,25 @@ lazy val predictive =
 lazy val predictiveJVM = predictive.jvm
 lazy val predictiveJS = predictive.js
 
+// Optional finite-domain measurement and scatter adapters. Imaging and surface
+// composition remains downstream.
+lazy val locus =
+  crossProject(JSPlatform, JVMPlatform)
+    .crossType(CrossType.Full)
+    .in(file("modules/mvpa4s-locus"))
+    .dependsOn(core)
+    .settings(commonSettings)
+    .settings(
+      name := "mvpa4s-locus",
+      description := "Locus support measurements, centered neighborhoods, scatter and volume support graphs."
+    )
+    .jvmConfigure(_.dependsOn(locus4sDataJVM))
+    .jsConfigure(_.dependsOn(locus4sDataJS))
+    .jsSettings(jsSettings)
+
+lazy val locusJVM = locus.jvm
+lazy val locusJS = locus.js
+
 // An external consumer: it lives outside the `mvpa4s` package, so it compiles
 // only against the public API and cannot reach package-private members.
 lazy val consumer =
@@ -202,8 +223,8 @@ lazy val consumer =
 lazy val root =
   project
     .in(file("."))
-    .aggregate(core.jvm, core.js, testkit.jvm, testkit.js, predictive.jvm, predictive.js, consumer.jvm, consumer.js)
+    .aggregate(core.jvm, core.js, testkit.jvm, testkit.js, predictive.jvm, predictive.js, locus.jvm, locus.js, consumer.jvm, consumer.js)
     .settings(name := "mvpa4s-root", publish / skip := true)
 
 addCommandAlias("mvpa4sCompileAll", ";root/compile;root/Test/compile")
-addCommandAlias("mvpa4sTestAll", ";coreJVM/test;coreJS/test;testkitJVM/test;testkitJS/test;predictiveJVM/test;predictiveJS/test;consumerJVM/test;consumerJS/test")
+addCommandAlias("mvpa4sTestAll", ";coreJVM/test;coreJS/test;testkitJVM/test;testkitJS/test;predictiveJVM/test;predictiveJS/test;locusJVM/test;locusJS/test;consumerJVM/test;consumerJS/test")
