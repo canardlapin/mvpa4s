@@ -83,6 +83,29 @@ class AtlasMeasurementFramesSuite extends munit.FunSuite:
     assertEquals(onAtlas.toVector.map(numeric), Vector(Some(10.0), None, Some(20.0), Some(10.0), None, Some(20.0)))
     assert(onAtlas.space.sameRuntimeOwnerAs(realization.parcelAssignment.from))
 
+  test("unsorted parcel keys retain their fibers through sorted traversal and ordinal display order"):
+    val source = axis
+    val realization = atlas(keys = Vector("parcel:Z", "parcel:A"), display = Vector(0, 1))
+    val adapted = right(AtlasMeasurementFrames.parcels(source, declaration)(realization)(correspondence(source)(realization)))
+    val subjects = right(AxisRef.fromStableKeys("unsorted-subjects", SpaceRole.Samples, Vector("s1"), "subject", "BOLD", "raw"))
+    val id = SourceId.unsafe("unsorted-evidence")
+    val evidence = right(EvidenceSource(id, Provenance.source(ProvenanceId.unsafe("unsorted-root"), id)))
+    val data = right(Observations.fromDense(subjects, source, DMat.dense(1, 6, Vector(40.0, 10.0, 60.0, 30.0, 20.0, 50.0)),
+      ValueIdentity.source(ValueId.unsafe("unsorted-values")), evidence))
+    val visitor = new MeasurementVisitor[subjects.Id, source.Id, String, SpatialMeasurementRendition[source.Locus], DMat]:
+      def visit[L <: SemanticSpace](entry: PackedMeasurementEntry[source.Id, String, SpatialMeasurementRendition[source.Locus]] { type Local = L }, measured: MeasuredObservations[subjects.Id, L]): Either[MeasurementFailure, DMat] =
+        Right(right(measured.patterns(DMat.eye(measured.localAxis.size))))
+    val result = adapted.frame.traverse(1)(Right(MeasurementResource(data)(())))(visitor)
+    assertEquals(result.error, None)
+    assertEquals(result.value.map(_.descriptor.id.value), Vector("parcel:A", "parcel:Z"))
+    assertEquals(adapted.displayOrder.map(_.value), Vector("parcel:Z", "parcel:A"))
+    assertEquals(result.value.map(_.rendition.label), Vector(Some("B"), Some("A")))
+    assertEquals(result.value.map(_.rendition.support.ordinalsInDomainOrder.toVector), Vector(Vector(2, 3), Vector(0, 1)))
+    val expected = Vector(Vector(60.0, 30.0), Vector(40.0, 10.0))
+    result.value.zip(expected).foreach: (outcome, values) =>
+      val actual = outcome.value.toOption.get
+      for column <- 0 until 2 do assertEqualsDouble(actual(0, column), values(column), 0.0)
+
   test("labels and display order are presentation; exact membership remains scientific identity"):
     val source = axis
     val base = atlas()
