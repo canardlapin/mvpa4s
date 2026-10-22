@@ -1,0 +1,9 @@
+# U6 optional surface and atlas MVPA adapters
+
+Runtime candidate `c27469484bf760c34cd896dabe4fe1c384a83b45` extracts the two generic surface helpers and adds an optional atlas correspondence adapter. Core and locus acquire no imaging dependency. Surface uses neurosurf4s core; atlas uses neuroatlas4s semantic core. Production algorithms and original three surface tests retain their literal topology/frame goldens.
+
+Both platforms pass 20 locus, 3 surface, 7 atlas and 2 public-consumer cases. Root cutover `70b3ee7bc0a35e28569ae6d68c5c88c8ff9cc599` passes 34 existing caller/example cases. A separate Git-pinned public consumer, using its own staging and freshly source-published private Gale/Resample artifacts, passes four cases across JVM/JS and preserves exact input/artifact hashes. Its source, driver and receipt are retained here; private artifact custody is recorded in `qualification.json`. Startup Git discovery diagnostics and the earlier missing-artifact failure remain in the raw logs.
+
+Atlas membership derives only from assignment fibers transported through the caller's certified bijection. Scientific traversal remains ID-sorted and atlas display order stays separate. Explicit unknown/background assignment remains unvisited during scatter; no label-string policy is invented. The native volume classification example now uses complete parcel keys, deliberately changing its example frame IDs while preserving literal feature order and numerical results. This is distinct from the unchanged generic identity goldens.
+
+Independent source and affected-test reviews approved the provider and Root cutover. Final receipt review is recorded in `review.md`. These are bounded adapter/consumer claims, not main landing, artifact release, native/visual acceptance or expanded scientific claims. Final U6 cleanup/build/acceptance remain separate.
