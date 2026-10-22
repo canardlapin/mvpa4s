@@ -154,6 +154,29 @@ object SpatialMeasurementFrames:
         )
       regions(source, declaration, sites.result())
 
+  def surfacePatches[K, C, S](
+      source: AxisRef[K] { type Locus = S },
+      declaration: MeasurementFrameDeclaration,
+      patches: CenteredNeighborhoodSystem[C, S],
+      label: Index[S] => Option[String] = (_: Index[S]) => None
+  ): Either[SpatialMeasurementFrameError, MeasurementFrame[source.Id, K, SpatialMeasurementRendition[S]]] =
+    if !source.locus.sameRuntimeOwnerAs(patches.ambient) then
+      Left(ownerError("surface patch centers", source, patches.ambient.toString))
+    else
+      val sites = Vector.newBuilder[SpatialMeasurementSite[S]]
+      val centers = patches.centers.indices
+      while centers.hasNext do
+        val compact = centers.next()
+        val center = patches.center(compact)
+        sites += SpatialMeasurementSite(
+          SpatialMeasurementFrames.centeredId(source, CenteredMeasurementKind.Surface, center),
+          SpatialMeasurementSupport.Regional(patches.neighborhood(compact)),
+          Some(center),
+          label(center)
+        )
+      SpatialMeasurementFrames.regions(source, declaration, sites.result())
+
+
   /** Stable persisted identity shared by centered volume and surface adapters.
     * The typed center is an ambient ordinal, never a compact position. */
   def centeredId[K, S](

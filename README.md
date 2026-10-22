@@ -17,7 +17,7 @@ do not own:
 | Fit lifecycles, cross-fitting, fitted artifacts (predictive module only) | [Alder](https://github.com/canardlapin/alder) |
 
 The core has no Alder, imaging, surface, atlas, dataset or fMRI-fit dependency.
-Neuroimaging integrations live downstream (for example in ScalaFIM).
+Optional surface and atlas adapters live in separate artifacts; fMRI workflow and fit policy stay downstream (for example in ScalaFIM).
 
 ## Modules
 
@@ -26,6 +26,8 @@ Neuroimaging integrations live downstream (for example in ScalaFIM).
 | `mvpa4s-core` | axes, reindexing legs, evidence identity and origins, relations, pattern analyses, measurement and execution contracts |
 | `mvpa4s-predictive` | optional [Alder](https://github.com/canardlapin/alder) adapters: training-only preparation, soft LDA, held-out prediction, validation and tuning; see the [predictive guide](docs/predictive.md) |
 | `mvpa4s-locus` | optional locus-domain region/selection measurements, centered neighborhoods, scatter and exact volume support graphs; no imaging or surface dependency |
+| `mvpa4s-surface` | optional anatomical support graphs over neurosurf4s core; no volume, atlas or rendering dependency |
+| `mvpa4s-atlas` | optional parcel measurements over neuroatlas4s core, with explicit sample bijections and separate display order |
 | `mvpa4s-testkit` | test-scope support for consumers: validated fixture identities and R parity reference data |
 
 ## Example
@@ -48,6 +50,21 @@ The [core guide](docs/core.md) covers the evidence model, kernels and pattern
 interpretation. A compiled version of this and other public-API uses lives in
 [`examples/consumer`](examples/consumer/src/main/scala/example/MvpaConsumer.scala).
 
+## Optional atlas measurements
+
+`mvpa4s.atlas.AtlasMeasurementFrames.parcels(source, declaration)(atlas)(samples)`
+requires a certified `Bijection[atlas.X, source.Locus]` from atlas samples to the
+MVPA axis. Equal sizes, labels or persistent fingerprints do not authorize live
+domain substitution. This is a correspondence adapter, not registration or resampling.
+
+The returned frame traverses complete parcel keys in ID order; `displayOrder`
+retains the atlas presentation order separately. Membership comes only from the
+atlas assignment. Unassigned/background samples remain unvisited when the existing
+`SpatialMeasurementScatter` scatters results; pulling that field back through
+`samples.toTotalMap` restores original atlas sample order. The independent
+[`imaging consumer`](examples/imaging-consumer) exercises these public APIs on
+both platforms without ScalaFIM or provider test internals.
+
 ## Identity and compatibility
 
 Persisted scientific tags and digest framing are unchanged from the code's
@@ -68,7 +85,11 @@ pinned Gale and Resample4s artifacts:
 
 ```sh
 tools/prepare-pinned-dependencies.sh
-sbt mvpa4sCompileAll mvpa4sTestAll
+sbt mvpa4sCompileAll
+sbt locusJVM/test locusJS/test
+sbt surfaceJVM/test surfaceJS/test
+sbt atlasJVM/test atlasJS/test imagingConsumerJVM/test imagingConsumerJS/test
+# Core and predictive suites remain available through mvpa4sTestAll.
 ```
 
 For coordinated provider work, `-Dmvpa4s.<provider>.build=<path>` (for example

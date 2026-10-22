@@ -84,6 +84,30 @@ lazy val alderTuneJS = ProjectRef(alderBuild, "tuneJS")
 lazy val alderMetricsJVM = ProjectRef(alderBuild, "metricsJVM")
 lazy val alderMetricsJS = ProjectRef(alderBuild, "metricsJS")
 
+// Optional imaging integrations share the caller's explicit provider overrides.
+// They add no dependency edge from core or locus to an imaging runtime.
+def forwardImagingOverrides(owner: String): Unit =
+  Seq("locus4s", "neuroim4s", "neurosurf4s", "mesh4s", "image4s", "spatial4s",
+    "reframe4s", "gale", "graph4s", "zarr4s", "ravel", "intaglio").foreach { provider =>
+    sys.props.get(s"mvpa4s.$provider.build").foreach(System.setProperty(s"$owner.$provider.build", _))
+  }
+
+lazy val neurosurf4sRevision = "73a244fbe5d7b4db2f0c946d98fa2a3c00101ab7"
+lazy val neurosurf4sBuild = {
+  forwardImagingOverrides("neurosurf4s")
+  pinned("neurosurf4s", neurosurf4sRevision)
+}
+lazy val neurosurf4sCoreJVM = ProjectRef(neurosurf4sBuild, "coreJVM")
+lazy val neurosurf4sCoreJS = ProjectRef(neurosurf4sBuild, "coreJS")
+
+lazy val neuroatlas4sRevision = "4df875d8a1cd20afd3b83ed49446422bc507e5ec"
+lazy val neuroatlas4sBuild = {
+  forwardImagingOverrides("neuroatlas4s")
+  pinned("neuroatlas4s", neuroatlas4sRevision)
+}
+lazy val neuroatlas4sCoreJVM = ProjectRef(neuroatlas4sBuild, "coreJVM")
+lazy val neuroatlas4sCoreJS = ProjectRef(neuroatlas4sBuild, "coreJS")
+
 lazy val commonSettings = Seq(
   scalacOptions ++= Seq(
     "-deprecation",
@@ -209,6 +233,37 @@ lazy val locus =
 lazy val locusJVM = locus.jvm
 lazy val locusJS = locus.js
 
+// Optional anatomical mesh support; no volume, atlas or rendering dependency.
+lazy val surface = crossProject(JSPlatform, JVMPlatform)
+  .crossType(CrossType.Full)
+  .in(file("modules/mvpa4s-surface"))
+  .dependsOn(locus)
+  .settings(commonSettings)
+  .settings(name := "mvpa4s-surface")
+  .jvmConfigure(_.dependsOn(neurosurf4sCoreJVM))
+  .jsConfigure(_.dependsOn(neurosurf4sCoreJS))
+  .jsSettings(jsSettings)
+
+// Atlas assignments are adapted through a certified sample correspondence.
+// Only the runtime-independent atlas semantic core is required.
+lazy val atlas = crossProject(JSPlatform, JVMPlatform)
+  .crossType(CrossType.Full)
+  .in(file("modules/mvpa4s-atlas"))
+  .dependsOn(locus)
+  .settings(commonSettings)
+  .settings(name := "mvpa4s-atlas")
+  .jvmConfigure(_.dependsOn(neuroatlas4sCoreJVM))
+  .jsConfigure(_.dependsOn(neuroatlas4sCoreJS))
+  .jsSettings(jsSettings)
+
+lazy val imagingConsumer = crossProject(JSPlatform, JVMPlatform)
+  .crossType(CrossType.Pure)
+  .in(file("examples/imaging-consumer"))
+  .dependsOn(surface, atlas)
+  .settings(commonSettings)
+  .settings(name := "mvpa4s-imaging-consumer", publish / skip := true)
+  .jsSettings(jsSettings)
+
 // An external consumer: it lives outside the `mvpa4s` package, so it compiles
 // only against the public API and cannot reach package-private members.
 lazy val consumer =
@@ -223,8 +278,10 @@ lazy val consumer =
 lazy val root =
   project
     .in(file("."))
-    .aggregate(core.jvm, core.js, testkit.jvm, testkit.js, predictive.jvm, predictive.js, locus.jvm, locus.js, consumer.jvm, consumer.js)
+    .aggregate(core.jvm, core.js, testkit.jvm, testkit.js, predictive.jvm, predictive.js, locus.jvm, locus.js, surface.jvm, surface.js, atlas.jvm, atlas.js, imagingConsumer.jvm, imagingConsumer.js, consumer.jvm, consumer.js)
     .settings(name := "mvpa4s-root", publish / skip := true)
 
 addCommandAlias("mvpa4sCompileAll", ";root/compile;root/Test/compile")
-addCommandAlias("mvpa4sTestAll", ";coreJVM/test;coreJS/test;testkitJVM/test;testkitJS/test;predictiveJVM/test;predictiveJS/test;locusJVM/test;locusJS/test;consumerJVM/test;consumerJS/test")
+addCommandAlias("mvpa4sTestAll", ";coreJVM/test;coreJS/test;testkitJVM/test;testkitJS/test;predictiveJVM/test;predictiveJS/test;locusJVM/test;locusJS/test;consumerJVM/test;consumerJS/test;mvpa4sImagingTestAll")
+
+addCommandAlias("mvpa4sImagingTestAll", ";surfaceJVM/test;surfaceJS/test;atlasJVM/test;atlasJS/test;imagingConsumerJVM/test;imagingConsumerJS/test")
