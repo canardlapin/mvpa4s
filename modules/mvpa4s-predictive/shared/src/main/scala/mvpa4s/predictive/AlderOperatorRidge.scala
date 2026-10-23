@@ -1,6 +1,5 @@
 package mvpa4s.predictive
 
-import alder.data.FixedCoverage
 import alder.kernel.*
 import cats.Id
 import cats.data.EitherT
@@ -54,6 +53,8 @@ enum AlderOperatorRidgeError:
 /** Alder lifecycle for OperatorRidge.  It stores no dense pattern matrix: the
   * learner derives its operator restriction solely from the Fit-role rows. */
 object AlderOperatorRidge:
+  private val rowAccess = AlderOperatorLifecycle.RowAccess[AlderOperatorRidgeRow](_.nativeId, _.ordinal)
+
   def admit(
       operator: PatternOperator,
       targets: Vector[Double],
@@ -65,7 +66,7 @@ object AlderOperatorRidge:
       _ <- if operator.samples == mapping.axis.size then Right(()) else Left(AlderOperatorRidgeError.OperatorSampleCount(mapping.axis.size, operator.samples))
       _ <- if targets.length == mapping.axis.size then Right(()) else Left(AlderOperatorRidgeError.Admission(AlderPredictiveAdmissionError.MatrixShapeMismatch("targets", targets.length, 1, mapping.axis.size, 1)))
       required = targets.length.toLong
-      _ <- if required <= budget.maximumCells then Right(()) else Left(AlderOperatorRidgeError.Budget(required, budget.maximumCells))
+      _ <- AlderOperatorLifecycle.budget(required, budget)(AlderOperatorRidgeError.Budget.apply)
       root <- mapping.identifiedRows((id, ordinal) => Example(AlderOperatorRidgeRow(id, ordinal), Array(targets(ordinal)), ())).left.map(AlderOperatorRidgeError.Admission.apply)
     yield new AlderOperatorRidgeRows(root, mapping, operator, OperatorRidgeAdmissionReceipt(targets.length, required, budget.maximumCells), None)
 
@@ -76,7 +77,7 @@ object AlderOperatorRidge:
       _ <- NativeAxisMapping.verify(mapping.axis, mapping, mapping.declaredSource).left.map(AlderOperatorRidgeError.Admission.apply)
       _ <- if operator.samples == mapping.axis.size && membership.samples == mapping.axis.size then Right(()) else Left(AlderOperatorRidgeError.OperatorSampleCount(mapping.axis.size, operator.samples))
       required = membership.samples.toLong * membership.classCount.toLong
-      _ <- if required <= budget.maximumCells then Right(()) else Left(AlderOperatorRidgeError.Budget(required, budget.maximumCells))
+      _ <- AlderOperatorLifecycle.budget(required, budget)(AlderOperatorRidgeError.Budget.apply)
       root <- mapping.identifiedRows((id, ordinal) => Example(AlderOperatorRidgeRow(id, ordinal), Array.tabulate(membership.classCount)(klass => membership.values(ordinal, klass)), ())).left.map(AlderOperatorRidgeError.Admission.apply)
     yield new AlderOperatorRidgeRows(root, mapping, operator, OperatorRidgeAdmissionReceipt(membership.samples, required, budget.maximumCells), Some(membership.classes))
 
@@ -97,49 +98,44 @@ object AlderOperatorRidge:
     val scores = Matrix.newBuilder(design.samples.size, coding.classes.length)
     val assembled = Array.fill[Option[OperatorRidgePrediction]](design.samples.size)(None)
     val fits = Vector.newBuilder[AlderOperatorRidgeFoldFit]
-    var fold = 0
-    var failure = Option.empty[AlderOperatorRidgeError]
-    while fold < design.keys.length && failure.isEmpty do
-      design.at(design.keys(fold)) match
-        case Left(error) => failure = Some(AlderOperatorRidgeError.Evidence(error))
-        case Right(unit) =>
-          val trainIds = unit.analysis.ordinals.toVector.map(rows.mapping.nativeIds)
-          val testIds = unit.assessment.ordinals.toVector.map(rows.mapping.nativeIds)
-          rows.root.fixedHoldout(trainIds, testIds, FixedCoverage.Exhaustive) match
-            case Left(error) => failure = Some(AlderOperatorRidgeError.Admission(AlderPredictiveAdmissionError.ProviderFixedSelection(error.toString)))
-            case Right(split) =>
-              val context = FitContext.root(Seed(design.receipt.seed.value), PlanFingerprint(AxisDigest.sha256Hex: writer =>
-                writer.string("scalafim.operator-ridge-fold.v1"); writer.string(rows.root.fingerprint.digest)
-                writer.intLE(unit.key.repeat); writer.intLE(unit.key.fold)
-                writer.string(java.lang.Long.toHexString(java.lang.Double.doubleToLongBits(config.penalty.value)))
-                writer.string(java.lang.Long.toHexString(java.lang.Double.doubleToLongBits(config.tolerance.value)))
-                writer.intLE(config.maxIterations.value)
-                coding.values.foreach((value, label) =>
-                  writer.string(java.lang.Long.toHexString(java.lang.Double.doubleToLongBits(value))); writer.string(label.value))
-              ), SchemaFingerprint("scalafim.operator-ridge.v1"), NumericMode.Deterministic)
-              new RidgeLearner(rows, coding, config, fold).fit(split.train)(using context).value match
+    val traversed = AlderOperatorLifecycle.foreachFold(rows.root, rows.mapping, design)(
+      AlderOperatorRidgeError.Evidence.apply,
+      error => AlderOperatorRidgeError.Admission(AlderPredictiveAdmissionError.ProviderFixedSelection(error.toString)))((fold, key, split) =>
+      val context = FitContext.root(Seed(design.receipt.seed.value), PlanFingerprint(AxisDigest.sha256Hex: writer =>
+        writer.string("scalafim.operator-ridge-fold.v1"); writer.string(rows.root.fingerprint.digest)
+        writer.intLE(key.repeat); writer.intLE(key.fold)
+        writer.string(java.lang.Long.toHexString(java.lang.Double.doubleToLongBits(config.penalty.value)))
+        writer.string(java.lang.Long.toHexString(java.lang.Double.doubleToLongBits(config.tolerance.value)))
+        writer.intLE(config.maxIterations.value)
+        coding.values.foreach((value, label) =>
+          writer.string(java.lang.Long.toHexString(java.lang.Double.doubleToLongBits(value))); writer.string(label.value))
+      ), SchemaFingerprint("scalafim.operator-ridge.v1"), NumericMode.Deterministic)
+      new RidgeLearner(rows, coding, config, fold).fit(split.train)(using context).value match
+        case Left(error) => Left(error.cause)
+        case Right(trained) =>
+          var failure = Option.empty[AlderOperatorRidgeError]
+          fits += AlderOperatorRidgeFoldFit(key, stableKeys(split.train.data, rows), trained.audit, trained.artifact.model)
+          split.test.data.foreachRow: (id, example) =>
+            if failure.isEmpty then
+              trained.artifact.run(example.input) match
                 case Left(error) => failure = Some(error.cause)
-                case Right(trained) =>
-                  fits += AlderOperatorRidgeFoldFit(unit.key, stableKeys(split.train.data, rows), trained.audit, trained.artifact.model)
-                  split.test.data.foreachRow: (id, example) =>
-                    if failure.isEmpty then
-                      trained.artifact.run(example.input) match
-                        case Left(error) => failure = Some(error.cause)
-                        case Right(prediction) =>
-                          val ordinal = example.input.ordinal
-                          if id.value != rows.mapping.nativeIds(ordinal) then failure = Some(AlderOperatorRidgeError.OperatorRowMismatch(id.value, ordinal))
-                          else if assembled(ordinal).nonEmpty then failure = Some(AlderOperatorRidgeError.DuplicateAssessment(rows.mapping.entriesByOrdinal(ordinal).stableKey))
-                          else if prediction.classes.toSet != coding.classes.toSet then failure = Some(AlderOperatorRidgeError.CodingMismatch(coding.classes, prediction.classes))
-                          else
-                            var column = 0
-                            while column < coding.classes.length do
-                              scores(ordinal, column) = prediction.scores(0, prediction.classes.indexOf(coding.classes(column)))
-                              column += 1
-                            assembled(ordinal) = Some(prediction)
-      fold += 1
-    failure.orElse(assembled.zipWithIndex.collectFirst { case (None, ordinal) => AlderOperatorRidgeError.MissingAssessment(rows.mapping.entriesByOrdinal(ordinal).stableKey) }) match
-      case Some(error) => Left(error)
-      case None => Right(AlderOperatorRidgeResult(OperatorRidgePrediction(coding.classes, scores.result(), Vector.tabulate(design.samples.size)(SampleIndex.apply)), design.receipt, fits.result(), rows.receipt))
+                case Right(prediction) =>
+                  val ordinal = example.input.ordinal
+                  if id.value != rows.mapping.nativeIds(ordinal) then failure = Some(AlderOperatorRidgeError.OperatorRowMismatch(id.value, ordinal))
+                  else if assembled(ordinal).nonEmpty then failure = Some(AlderOperatorRidgeError.DuplicateAssessment(rows.mapping.entriesByOrdinal(ordinal).stableKey))
+                  else if prediction.classes.toSet != coding.classes.toSet then failure = Some(AlderOperatorRidgeError.CodingMismatch(coding.classes, prediction.classes))
+                  else
+                    var column = 0
+                    while column < coding.classes.length do
+                      scores(ordinal, column) = prediction.scores(0, prediction.classes.indexOf(coding.classes(column)))
+                      column += 1
+                    assembled(ordinal) = Some(prediction)
+          failure.toLeft(())
+    )
+    traversed.flatMap: _ =>
+      assembled.zipWithIndex.collectFirst { case (None, ordinal) => AlderOperatorRidgeError.MissingAssessment(rows.mapping.entriesByOrdinal(ordinal).stableKey) } match
+        case Some(error) => Left(error)
+        case None => Right(AlderOperatorRidgeResult(OperatorRidgePrediction(coding.classes, scores.result(), Vector.tabulate(design.samples.size)(SampleIndex.apply)), design.receipt, fits.result(), rows.receipt))
 
   private final class RidgeLearner(rows: AlderOperatorRidgeRows, coding: SwiftTargetCoding, config: OperatorRidgeConfig, fold: Int)
       extends Learner[Id, AlderOperatorRidgeRow, Array[Double], Unit, OperatorRidgePrediction]:
@@ -174,26 +170,24 @@ object AlderOperatorRidge:
       operator.selectRowPositions(Vector(input.ordinal)).left.map(error => stage.failure(AlderOperatorRidgeError.Mvpa(error))).flatMap: selected =>
         model.predict(selected).left.map(error => stage.failure(AlderOperatorRidgeError.Operator(error)))
 
-  private def training(data: Data[?, Example[AlderOperatorRidgeRow, Array[Double], Unit]], rows: AlderOperatorRidgeRows, coding: SwiftTargetCoding): Either[AlderOperatorRidgeError, (Vector[Int], Vector[ClassLabel], Vector[Vector[Double]])] =
+  private def training[U <: Use.Fit](data: Data[U, Example[AlderOperatorRidgeRow, Array[Double], Unit]], rows: AlderOperatorRidgeRows, coding: SwiftTargetCoding): Either[AlderOperatorRidgeError, (Vector[Int], Vector[ClassLabel], Vector[Vector[Double]])] =
     val ordinals = Vector.newBuilder[Int]
     val labels = Vector.newBuilder[ClassLabel]
     val soft = Vector.newBuilder[Vector[Double]]
-    var failure = Option.empty[AlderOperatorRidgeError]
-    data.foreachRow: (id, example) =>
-      if failure.isEmpty then
-        val ordinal = example.input.ordinal
-        if ordinal < 0 || ordinal >= rows.mapping.nativeIds.length || id.value != example.input.nativeId || id.value != rows.mapping.nativeIds(ordinal) then failure = Some(AlderOperatorRidgeError.OperatorRowMismatch(id.value, ordinal))
-        else rows.softClasses match
-          case Some(classes) if example.target.length == classes.length =>
-            val values = example.target.toVector
-            val label = classes(values.indices.maxBy(values))
-            ordinals += ordinal; labels += label; soft += values
-          case Some(_) => failure = Some(AlderOperatorRidgeError.TargetShape(rows.mapping.entriesByOrdinal(ordinal).stableKey))
-          case None if example.target.length != 1 => failure = Some(AlderOperatorRidgeError.TargetShape(rows.mapping.entriesByOrdinal(ordinal).stableKey))
-          case None => coding.label(example.target(0)) match
-            case None => failure = Some(AlderOperatorRidgeError.UnknownTarget(rows.mapping.entriesByOrdinal(ordinal).stableKey, example.target(0)))
-            case Some(label) => ordinals += ordinal; labels += label
-    failure.toLeft((ordinals.result(), labels.result(), soft.result()))
+    val decoded = AlderOperatorLifecycle.foreachTrainingRow(data, rows.mapping, rowAccess)(
+      AlderOperatorRidgeError.OperatorRowMismatch.apply)((ordinal, target) =>
+      rows.softClasses match
+        case Some(classes) if target.length == classes.length =>
+          val values = target.toVector
+          val label = classes(values.indices.maxBy(values))
+          ordinals += ordinal; labels += label; soft += values; Right(())
+        case Some(_) => Left(AlderOperatorRidgeError.TargetShape(rows.mapping.entriesByOrdinal(ordinal).stableKey))
+        case None if target.length != 1 => Left(AlderOperatorRidgeError.TargetShape(rows.mapping.entriesByOrdinal(ordinal).stableKey))
+        case None => coding.label(target(0)) match
+          case None => Left(AlderOperatorRidgeError.UnknownTarget(rows.mapping.entriesByOrdinal(ordinal).stableKey, target(0)))
+          case Some(label) => ordinals += ordinal; labels += label; Right(())
+    )
+    decoded.map(_ => (ordinals.result(), labels.result(), soft.result()))
 
   private def stableKeys(data: Data[?, Example[AlderOperatorRidgeRow, Array[Double], Unit]], rows: AlderOperatorRidgeRows): Vector[String] =
-    data.foldRows(Vector.empty[String])((out, _, example) => out :+ rows.mapping.entriesByOrdinal(example.input.ordinal).stableKey)
+    AlderOperatorLifecycle.stableKeys(data, rows.mapping, rowAccess)

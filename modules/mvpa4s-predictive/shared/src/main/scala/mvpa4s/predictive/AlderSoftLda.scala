@@ -1,6 +1,5 @@
 package mvpa4s.predictive
 
-import alder.data.FixedCoverage
 import alder.kernel.*
 import cats.Id
 import cats.data.EitherT
@@ -60,6 +59,8 @@ enum AlderSoftLdaError:
 /** Native Alder lifecycle for soft LDA.  It deliberately fits the extracted
   * single-fit numerical kernel. */
 object AlderSoftLda:
+  private val rowAccess = AlderOperatorLifecycle.RowAccess[AlderSoftLdaRow](_.nativeId, _.ordinal)
+
   def admit(
       operator: PatternOperator,
       targets: Vector[Double],
@@ -74,7 +75,7 @@ object AlderSoftLda:
       _ <- if targets.length == mapping.axis.size then Right(()) else Left(AlderSoftLdaError.Admission(AlderPredictiveAdmissionError.MatrixShapeMismatch("targets", targets.length, 1, mapping.axis.size, 1)))
       _ <- if trialNuisance.forall(_.samples == mapping.axis.size) then Right(()) else Left(AlderSoftLdaError.Admission(AlderPredictiveAdmissionError.MatrixShapeMismatch("trial nuisance", trialNuisance.fold(0)(_.samples), trialNuisance.fold(0)(_.columns), mapping.axis.size, -1)))
       required = targets.length.toLong + nuisanceCells
-      _ <- if required <= budget.maximumCells then Right(()) else Left(AlderSoftLdaError.Budget(required, budget.maximumCells))
+      _ <- AlderOperatorLifecycle.budget(required, budget)(AlderSoftLdaError.Budget.apply)
       root <- mapping.identifiedRows((id, ordinal) => Example(AlderSoftLdaRow(id, ordinal), Array(targets(ordinal)), ())).left.map(AlderSoftLdaError.Admission.apply)
     yield new AlderSoftLdaRows(root, mapping, operator, SoftLdaAdmissionReceipt(targets.length, targets.length.toLong, nuisanceCells, budget.maximumCells), None, trialNuisance)
 
@@ -92,7 +93,7 @@ object AlderSoftLda:
       _ <- if trialNuisance.forall(_.samples == mapping.axis.size) then Right(()) else Left(AlderSoftLdaError.Admission(AlderPredictiveAdmissionError.MatrixShapeMismatch("trial nuisance", trialNuisance.fold(0)(_.samples), trialNuisance.fold(0)(_.columns), mapping.axis.size, -1)))
       targetCells = membership.samples.toLong * membership.classCount.toLong
       required = targetCells + nuisanceCells
-      _ <- if required <= budget.maximumCells then Right(()) else Left(AlderSoftLdaError.Budget(required, budget.maximumCells))
+      _ <- AlderOperatorLifecycle.budget(required, budget)(AlderSoftLdaError.Budget.apply)
       root <- mapping.identifiedRows((id, ordinal) => Example(AlderSoftLdaRow(id, ordinal), Array.tabulate(membership.classCount)(klass => membership.values(ordinal, klass)), ())).left.map(AlderSoftLdaError.Admission.apply)
     yield new AlderSoftLdaRows(root, mapping, operator, SoftLdaAdmissionReceipt(membership.samples, targetCells, nuisanceCells, budget.maximumCells), Some(membership.classes), trialNuisance)
 
@@ -114,47 +115,42 @@ object AlderSoftLda:
     val output = Matrix.newBuilder(design.samples.size, coding.classes.length)
     val assembled = Array.fill[Option[ClassificationPrediction]](design.samples.size)(None)
     val fits = Vector.newBuilder[AlderSoftLdaFoldFit]
-    var fold = 0
-    var failure = Option.empty[AlderSoftLdaError]
-    while fold < design.keys.length && failure.isEmpty do
-      design.at(design.keys(fold)) match
-        case Left(error) => failure = Some(AlderSoftLdaError.Evidence(error))
-        case Right(unit) =>
-          val trainIds = unit.analysis.ordinals.toVector.map(rows.mapping.nativeIds)
-          val testIds = unit.assessment.ordinals.toVector.map(rows.mapping.nativeIds)
-          rows.root.fixedHoldout(trainIds, testIds, FixedCoverage.Exhaustive) match
-            case Left(error) => failure = Some(AlderSoftLdaError.Admission(AlderPredictiveAdmissionError.ProviderFixedSelection(error.toString)))
-            case Right(split) =>
-              val context = fitContext(rows, design, unit.key, coding, config)
-              new SoftLdaLearner(rows, coding, config, fold).fit(split.train)(using context).value match
+    val traversed = AlderOperatorLifecycle.foreachFold(rows.root, rows.mapping, design)(
+      AlderSoftLdaError.Evidence.apply,
+      error => AlderSoftLdaError.Admission(AlderPredictiveAdmissionError.ProviderFixedSelection(error.toString)))((fold, key, split) =>
+      val context = fitContext(rows, design, key, coding, config)
+      new SoftLdaLearner(rows, coding, config, fold).fit(split.train)(using context).value match
+        case Left(error) => Left(error.cause)
+        case Right(trained) =>
+          var failure = Option.empty[AlderSoftLdaError]
+          val trainingKeys = stableKeys(split.train.data, rows)
+          fits += AlderSoftLdaFoldFit(key, trainingKeys, trained.audit, trained.artifact.model)
+          split.test.data.foreachRow: (id, example) =>
+            if failure.isEmpty then
+              trained.artifact.run(example.input) match
                 case Left(error) => failure = Some(error.cause)
-                case Right(trained) =>
-                  val trainingKeys = stableKeys(split.train.data, rows)
-                  fits += AlderSoftLdaFoldFit(unit.key, trainingKeys, trained.audit, trained.artifact.model)
-                  split.test.data.foreachRow: (id, example) =>
-                    if failure.isEmpty then
-                      trained.artifact.run(example.input) match
-                        case Left(error) => failure = Some(error.cause)
-                        case Right(prediction) =>
-                          val ordinal = example.input.ordinal
-                          if id.value != rows.mapping.nativeIds(ordinal) then failure = Some(AlderSoftLdaError.OperatorRowMismatch(id.value, ordinal))
-                          else if assembled(ordinal).nonEmpty then failure = Some(AlderSoftLdaError.DuplicateAssessment(rows.mapping.entriesByOrdinal(ordinal).stableKey))
-                          else Classification.reorderProbabilities(prediction.classes, prediction.probabilities, coding.classes) match
-                            case Left(error) => failure = Some(AlderSoftLdaError.Mvpa(error))
-                            case Right(probabilities) =>
-                              var column = 0
-                              while column < coding.classes.length do
-                                output(ordinal, column) = probabilities(0, column)
-                                column += 1
-                              assembled(ordinal) = Some(prediction)
-      fold += 1
-    failure.orElse(assembled.zipWithIndex.collectFirst { case (None, ordinal) => AlderSoftLdaError.MissingAssessment(rows.mapping.entriesByOrdinal(ordinal).stableKey) }) match
-      case Some(error) => Left(error)
-      case None =>
-        val prediction = ClassificationPrediction(coding.classes, output.result(), Vector.tabulate(design.samples.size)(SampleIndex.apply))
-        targetMembership(rows, coding).map: target =>
-          val (mse, accuracy) = metrics(prediction, target)
-          AlderSoftLdaResult(prediction, mse, accuracy, design.receipt, fits.result(), rows.receipt)
+                case Right(prediction) =>
+                  val ordinal = example.input.ordinal
+                  if id.value != rows.mapping.nativeIds(ordinal) then failure = Some(AlderSoftLdaError.OperatorRowMismatch(id.value, ordinal))
+                  else if assembled(ordinal).nonEmpty then failure = Some(AlderSoftLdaError.DuplicateAssessment(rows.mapping.entriesByOrdinal(ordinal).stableKey))
+                  else Classification.reorderProbabilities(prediction.classes, prediction.probabilities, coding.classes) match
+                    case Left(error) => failure = Some(AlderSoftLdaError.Mvpa(error))
+                    case Right(probabilities) =>
+                      var column = 0
+                      while column < coding.classes.length do
+                        output(ordinal, column) = probabilities(0, column)
+                        column += 1
+                      assembled(ordinal) = Some(prediction)
+          failure.toLeft(())
+    )
+    traversed.flatMap: _ =>
+      assembled.zipWithIndex.collectFirst { case (None, ordinal) => AlderSoftLdaError.MissingAssessment(rows.mapping.entriesByOrdinal(ordinal).stableKey) } match
+        case Some(error) => Left(error)
+        case None =>
+          val prediction = ClassificationPrediction(coding.classes, output.result(), Vector.tabulate(design.samples.size)(SampleIndex.apply))
+          targetMembership(rows, coding).map: target =>
+            val (mse, accuracy) = metrics(prediction, target)
+            AlderSoftLdaResult(prediction, mse, accuracy, design.receipt, fits.result(), rows.receipt)
 
   private final class SoftLdaLearner(rows: AlderSoftLdaRows, coding: SwiftTargetCoding, config: SoftLdaConfig, fold: Int)
       extends Learner[Id, AlderSoftLdaRow, Array[Double], Unit, ClassificationPrediction]:
@@ -181,35 +177,31 @@ object AlderSoftLda:
     def run(input: AlderSoftLdaRow): Either[Failure[AlderSoftLdaError], ClassificationPrediction] =
       operator.selectRowPositions(Vector(input.ordinal)).left.map(error => stage.failure(AlderSoftLdaError.Mvpa(error))).flatMap(selected => model.predict(selected).left.map(error => stage.failure(AlderSoftLdaError.SoftLda(error))))
 
-  private def training(data: Data[?, Example[AlderSoftLdaRow, Array[Double], Unit]], rows: AlderSoftLdaRows, coding: SwiftTargetCoding, fold: Int): Either[AlderSoftLdaError, (Vector[Int], ClassMembership)] =
+  private def training[U <: Use.Fit](data: Data[U, Example[AlderSoftLdaRow, Array[Double], Unit]], rows: AlderSoftLdaRows, coding: SwiftTargetCoding, fold: Int): Either[AlderSoftLdaError, (Vector[Int], ClassMembership)] =
     val ordinals = Vector.newBuilder[Int]
     val values = Vector.newBuilder[Vector[Double]]
     val labels = Vector.newBuilder[ClassLabel]
-    var failure = Option.empty[AlderSoftLdaError]
-    data.foreachRow: (id, example) =>
-      if failure.isEmpty then
-        val ordinal = example.input.ordinal
-        if ordinal < 0 || ordinal >= rows.mapping.nativeIds.length || id.value != example.input.nativeId || id.value != rows.mapping.nativeIds(ordinal) then failure = Some(AlderSoftLdaError.OperatorRowMismatch(id.value, ordinal))
-        else rows.softClasses match
-          case Some(classes) if example.target.length == classes.length => ordinals += ordinal; values += example.target.toVector
-          case Some(_) => failure = Some(AlderSoftLdaError.TargetShape(rows.mapping.entriesByOrdinal(ordinal).stableKey))
-          case None if example.target.length != 1 => failure = Some(AlderSoftLdaError.TargetShape(rows.mapping.entriesByOrdinal(ordinal).stableKey))
-          case None => coding.label(example.target(0)) match
-            case None => failure = Some(AlderSoftLdaError.UnknownTarget(rows.mapping.entriesByOrdinal(ordinal).stableKey, example.target(0)))
-            case Some(label) => ordinals += ordinal; labels += label
-    failure match
-      case Some(error) => Left(error)
-      case None =>
-        val membershipValues = values.result()
-        rows.softClasses match
-          case None =>
-            val hardLabels = labels.result()
-            if hardLabels.distinct.length != coding.classes.length then Left(AlderSoftLdaError.MissingClass(fold))
-            else ClassMembership.hard(hardLabels).left.map(AlderSoftLdaError.Mvpa.apply).map(ordinals.result() -> _)
-          case Some(classes) =>
-            val missing = classes.indices.exists(column => membershipValues.forall(_(column) <= 0.0))
-            if missing then Left(AlderSoftLdaError.MissingClass(fold))
-            else ClassMembership.simplex(classes, DMat.dense(membershipValues.length, classes.length, membershipValues.flatten)).left.map(AlderSoftLdaError.Mvpa.apply).map(ordinals.result() -> _)
+    val decoded = AlderOperatorLifecycle.foreachTrainingRow(data, rows.mapping, rowAccess)(
+      AlderSoftLdaError.OperatorRowMismatch.apply)((ordinal, target) =>
+      rows.softClasses match
+        case Some(classes) if target.length == classes.length => ordinals += ordinal; values += target.toVector; Right(())
+        case Some(_) => Left(AlderSoftLdaError.TargetShape(rows.mapping.entriesByOrdinal(ordinal).stableKey))
+        case None if target.length != 1 => Left(AlderSoftLdaError.TargetShape(rows.mapping.entriesByOrdinal(ordinal).stableKey))
+        case None => coding.label(target(0)) match
+          case None => Left(AlderSoftLdaError.UnknownTarget(rows.mapping.entriesByOrdinal(ordinal).stableKey, target(0)))
+          case Some(label) => ordinals += ordinal; labels += label; Right(())
+    )
+    decoded.flatMap: _ =>
+      val membershipValues = values.result()
+      rows.softClasses match
+        case None =>
+          val hardLabels = labels.result()
+          if hardLabels.distinct.length != coding.classes.length then Left(AlderSoftLdaError.MissingClass(fold))
+          else ClassMembership.hard(hardLabels).left.map(AlderSoftLdaError.Mvpa.apply).map(ordinals.result() -> _)
+        case Some(classes) =>
+          val missing = classes.indices.exists(column => membershipValues.forall(_(column) <= 0.0))
+          if missing then Left(AlderSoftLdaError.MissingClass(fold))
+          else ClassMembership.simplex(classes, DMat.dense(membershipValues.length, classes.length, membershipValues.flatten)).left.map(AlderSoftLdaError.Mvpa.apply).map(ordinals.result() -> _)
 
   private def targetMembership(rows: AlderSoftLdaRows, coding: SwiftTargetCoding): Either[AlderSoftLdaError, ClassMembership] =
     rows.root
@@ -262,7 +254,7 @@ object AlderSoftLda:
           row += 1
 
   private def stableKeys(data: Data[?, Example[AlderSoftLdaRow, Array[Double], Unit]], rows: AlderSoftLdaRows): Vector[String] =
-    data.foldRows(Vector.empty[String])((out, _, example) => out :+ rows.mapping.entriesByOrdinal(example.input.ordinal).stableKey)
+    AlderOperatorLifecycle.stableKeys(data, rows.mapping, rowAccess)
 
   private def selectRows(values: DMat, positions: Vector[Int]): DMat =
     val out = Matrix.newBuilder(positions.length, values.cols)
