@@ -1,0 +1,59 @@
+{
+  "source": "11b547338df58dc8b922006e0a9cca9b575fe3ff",
+  "pins": {
+    "neurosurf4s": "4b23386bf750118b9c7c1220b6c592da9ba965e0",
+    "neuroatlas4s": "0256e98eb78d35523ce6dbd08fea4f19b76e1b68"
+  },
+  "diff": [
+    "build.sbt"
+  ],
+  "algorithm_or_domain_source_changes": false,
+  "checks": [
+    {
+      "name": "pins",
+      "source": "11b547338df58dc8b922006e0a9cca9b575fe3ff",
+      "counts": [
+        3,
+        3,
+        7,
+        7
+      ],
+      "exit_code": 0,
+      "command": [
+        "python3",
+        "tools/build/sbt-warm",
+        "surfaceJVM/test",
+        "surfaceJS/test",
+        "atlasJVM/test",
+        "atlasJS/test"
+      ],
+      "duration_seconds": 381.887272,
+      "raw_log": "checks/eco-mvpa-main-forward-pins-49.log.gz"
+    },
+    {
+      "name": "consumer",
+      "source": "11b547338df58dc8b922006e0a9cca9b575fe3ff",
+      "counts": [
+        2,
+        2
+      ],
+      "exit_code": 0,
+      "command": [
+        "python3",
+        "tools/build/sbt-warm",
+        "imagingConsumerJVM/test",
+        "imagingConsumerJS/test"
+      ],
+      "duration_seconds": 16.077309,
+      "raw_log": "checks/eco-mvpa-main-forward-consumer-51.log.gz"
+    }
+  ],
+  "scope": [
+    "Default exact Git source pins; no sibling overrides",
+    "Surface3/3, atlas7/7 and independentpublicimagingconsumer2/2 on JVM/JS",
+    "Gale/Alder and all other pins unchanged",
+    "Full Root default closure checked downstream; not claimed by these small integration tests",
+    "No numeric test/fixture/tolerance changes, no performance/hostedCI/main merge claim"
+  ],
+  "workspace_impact": "Catalog command refused existing uncataloged repos/worktrees; examined actual source-build imaging edges in build.sbt instead"
+}
