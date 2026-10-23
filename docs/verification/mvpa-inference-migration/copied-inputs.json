@@ -1,0 +1,781 @@
+{
+  "source_commit": "22defff67ea436afc1a68a018acb9aa2a1ad0d06",
+  "tool_files": [
+    {
+      "path": "tools/mvpa-inference/calibration_protocol.py",
+      "source_sha256": "b1c08c46dcb8ae5e9ebd4af195e5182027a91df2a11c589735c2f063a42d24d3",
+      "destination_sha256": "b1c08c46dcb8ae5e9ebd4af195e5182027a91df2a11c589735c2f063a42d24d3"
+    },
+    {
+      "path": "tools/mvpa-inference/calibration_readiness.py",
+      "source_sha256": "26ffe78fd01e743b65479ec0c9d29e8be981ee3efaffa07d7ceb80bf107f2e46",
+      "destination_sha256": "0daad0b728f2f72ab7f79d993ee2eae71bc7e969b48b44cb5c5d85102aefb2e5"
+    },
+    {
+      "path": "tools/mvpa-inference/diagnose_rank.R",
+      "source_sha256": "67b893a521accf941eeac7707f45bfb64545a64869bf02a7b3db590bf95f21df",
+      "destination_sha256": "67b893a521accf941eeac7707f45bfb64545a64869bf02a7b3db590bf95f21df"
+    },
+    {
+      "path": "tools/mvpa-inference/generate_component_fixtures.R",
+      "source_sha256": "d9fdddadb2af3f37b28037704d9cf99343c07a5e9bc658dc377f6f155663332f",
+      "destination_sha256": "d9fdddadb2af3f37b28037704d9cf99343c07a5e9bc658dc377f6f155663332f"
+    },
+    {
+      "path": "tools/mvpa-inference/generate_known_truth.R",
+      "source_sha256": "afffd607dd9f27ebc44f2ee5da2c218328b73f758660c253128d1eb0f905ff79",
+      "destination_sha256": "afffd607dd9f27ebc44f2ee5da2c218328b73f758660c253128d1eb0f905ff79"
+    },
+    {
+      "path": "tools/mvpa-inference/generate_rank_fixtures.R",
+      "source_sha256": "c18101e6a9a944458397613f190fe63839f5d4bb0a22436f8e526cfb26f843f3",
+      "destination_sha256": "c18101e6a9a944458397613f190fe63839f5d4bb0a22436f8e526cfb26f843f3"
+    },
+    {
+      "path": "tools/mvpa-inference/paired/analyze.R",
+      "source_sha256": "61f70f6b6a6d907cd01b326f312a96c5a262f5796c8ac545e30215e61433e4b6",
+      "destination_sha256": "61f70f6b6a6d907cd01b326f312a96c5a262f5796c8ac545e30215e61433e4b6"
+    },
+    {
+      "path": "tools/mvpa-inference/paired/audit_portability.py",
+      "source_sha256": "df950962dae6a7cd23d51d84c56b21d25a54595db70b49e308c3a4d3b07e442d",
+      "destination_sha256": "df950962dae6a7cd23d51d84c56b21d25a54595db70b49e308c3a4d3b07e442d"
+    },
+    {
+      "path": "tools/mvpa-inference/paired/audit_preflight.py",
+      "source_sha256": "e1f401999cf10f3e9743238510a9c0fd756f075620830129c47ddc075baf4e3c",
+      "destination_sha256": "e1f401999cf10f3e9743238510a9c0fd756f075620830129c47ddc075baf4e3c"
+    },
+    {
+      "path": "tools/mvpa-inference/paired/fixtures/historical-record.json",
+      "source_sha256": "2bd4c3b922d9a55dd90e980a50a20032de69d63f9f2c1237206d698d0074f625",
+      "destination_sha256": "2bd4c3b922d9a55dd90e980a50a20032de69d63f9f2c1237206d698d0074f625"
+    },
+    {
+      "path": "tools/mvpa-inference/paired/freeze.py",
+      "source_sha256": "5e4a89b08507d39806675138ef832bfcf0137ff034795f2030bc52576bee778f",
+      "destination_sha256": "a9d05ad6c6c276a660d21477b382e0cbdb20d3c6db46daa95f47e26dfb42bdbf"
+    },
+    {
+      "path": "tools/mvpa-inference/paired/generate.R",
+      "source_sha256": "86c08df91c53aff50ef7679f2571b37a3cefddb5017ea7ba31db0fb3e2564c92",
+      "destination_sha256": "86c08df91c53aff50ef7679f2571b37a3cefddb5017ea7ba31db0fb3e2564c92"
+    },
+    {
+      "path": "tools/mvpa-inference/paired/probe.py",
+      "source_sha256": "14fb2811a5b842bda7241d66bcbc3669e6bbdd16fc06b6c4ab5659acde82937c",
+      "destination_sha256": "b8df0246838a437b7a402d660b0d7c15527fbacc9c13a54c75c7228ed48ce140"
+    },
+    {
+      "path": "tools/mvpa-inference/paired/protocol.py",
+      "source_sha256": "07debb5d8d6b0cf1d97ff1c14593b321ee8b1a0dd67c000bd6a0754465dd4197",
+      "destination_sha256": "f1b334b0a7b464b451581c60fb58c6d12c5c575151896e978b3dc40331afaa60"
+    },
+    {
+      "path": "tools/mvpa-inference/paired/resources.py",
+      "source_sha256": "aec75c0c6a9e2d4ee8c9c0099740ec1bdf6ab4dc198ca1ca74cc6709f65823d2",
+      "destination_sha256": "aec75c0c6a9e2d4ee8c9c0099740ec1bdf6ab4dc198ca1ca74cc6709f65823d2"
+    },
+    {
+      "path": "tools/mvpa-inference/paired/run.py",
+      "source_sha256": "10d0f0b6e7a45dedae0fb1beea3a38726dd0020aef0b1813768c75a73f31e674",
+      "destination_sha256": "ba1f2f65c539b8bd02604e714f5a0033e9c9c5147207c788c16025a56c2f715b"
+    },
+    {
+      "path": "tools/mvpa-inference/paired/test_protocol.py",
+      "source_sha256": "49ed2969567b1bdf6d6ba3fd39610a1794453bb4ddcb83c23bcff0275867ad0a",
+      "destination_sha256": "49ed2969567b1bdf6d6ba3fd39610a1794453bb4ddcb83c23bcff0275867ad0a"
+    },
+    {
+      "path": "tools/mvpa-inference/qualify_known_truth.R",
+      "source_sha256": "908e00dd7fc3f90e85fcae4b5a4e8ca39327db5a3550914e42183cd7856b351e",
+      "destination_sha256": "908e00dd7fc3f90e85fcae4b5a4e8ca39327db5a3550914e42183cd7856b351e"
+    },
+    {
+      "path": "tools/mvpa-inference/rank_population.R",
+      "source_sha256": "8f83399a3cf895cf4d2fcb7918b03985ed547e915fb9a7f266548baeaba3998b",
+      "destination_sha256": "8f83399a3cf895cf4d2fcb7918b03985ed547e915fb9a7f266548baeaba3998b"
+    },
+    {
+      "path": "tools/mvpa-inference/rank_power_bound.R",
+      "source_sha256": "db2b0a2ee871fb1b702174cd00474c041765b5e7961619a4bf8ea3eb2b802dc0",
+      "destination_sha256": "db2b0a2ee871fb1b702174cd00474c041765b5e7961619a4bf8ea3eb2b802dc0"
+    },
+    {
+      "path": "tools/mvpa-inference/run_calibration.py",
+      "source_sha256": "0cf931668f91b2e8908e8c90b0e1a4d73a29b994b317406d1364b40be0011b83",
+      "destination_sha256": "0cf931668f91b2e8908e8c90b0e1a4d73a29b994b317406d1364b40be0011b83"
+    },
+    {
+      "path": "tools/mvpa-inference/run_rank_pilot.py",
+      "source_sha256": "ca5dce8562dfc8bc89655c037acf2a98e49d08fbae017f661db9df275c89286b",
+      "destination_sha256": "805db17408b39b766f78b5325d05488fbf35b9057769a43c9415052f3e87ae77"
+    },
+    {
+      "path": "tools/mvpa-inference/summarize_rank_pilot.R",
+      "source_sha256": "3f4953ce4064d45f1ce7af0b82b0d5b9b6595578390dd8020bbe3845f339500e",
+      "destination_sha256": "3f4953ce4064d45f1ce7af0b82b0d5b9b6595578390dd8020bbe3845f339500e"
+    },
+    {
+      "path": "tools/mvpa-inference/test_calibration_protocol.py",
+      "source_sha256": "db7170fb95e511ba4c650c1b86ff06fcefd462804c1cee87d2529197768b6905",
+      "destination_sha256": "db7170fb95e511ba4c650c1b86ff06fcefd462804c1cee87d2529197768b6905"
+    },
+    {
+      "path": "tools/mvpa-inference/test_calibration_readiness.py",
+      "source_sha256": "059283cdac7fc82a596aad85149c3fc8a266186106d05d2c5409c82ce6c56db2",
+      "destination_sha256": "059283cdac7fc82a596aad85149c3fc8a266186106d05d2c5409c82ce6c56db2"
+    },
+    {
+      "path": "tools/mvpa-inference/test_rank_population.R",
+      "source_sha256": "7f857b62ea43138b14cdefb09db3b7a478e47f9d67ef1e62275406fd3653dff2",
+      "destination_sha256": "7f857b62ea43138b14cdefb09db3b7a478e47f9d67ef1e62275406fd3653dff2"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "docs/plans/unified-mvpa-inference-calibration-protocol.md",
+      "sha256": "d612ca89ebc9f4ae3f3f7e6988a6e5b905f642505c46fed4240093eb9e1314d3"
+    },
+    {
+      "path": "docs/plans/unified-mvpa-rank-population-v1.md",
+      "sha256": "50ae6f7ca8b318250674d4e2115932696c4981c4a907676828ff637593b47264"
+    },
+    {
+      "path": "docs/plans/unified-mvpa-rank-metric-bindings-v1.md",
+      "sha256": "a97be2cbacb54381bfbd0d221bac4bd4ffd1fc327d42ef90ecf77c32c1e4f84a"
+    },
+    {
+      "path": "docs/scenarios/fixtures/mvpa.inference-known-truth.v1.r.json",
+      "sha256": "63b50c382fcbc021a70b5a10472477e756a7a9089d00894ef765885417d79a4b"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-integration-20261008/README.md",
+      "sha256": "1398f9c93d64b9441daba7068c884ef61d2bb48a20b9a68799856f8a52989903"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-integration-20261008/execution.json",
+      "sha256": "43e18c42296a02c84f0587447d53fa149e725c202699f3b8301bb456594db0d8"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-integration-20261008/finalize_evidence.py",
+      "sha256": "4b8169f241405497c96eab466650cf6cf29815ea892b63d69c4f07f2c2e7931f"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-integration-20261008/historical/historical-gate-verification.json",
+      "sha256": "98bad95cde21446be51ab7ccdee60162669313c5518bbecb37d522b92da25b50"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-integration-20261008/historical/historical-gates.json",
+      "sha256": "cef2a0297583f2efdc58d41e9f2c68a87a0bef74b7045900ff74558d499870e3"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-integration-20261008/historical/historical-gates.log.gz",
+      "sha256": "0943c722f87a808d68deaf866bcbf378b59e6adae7c0eb7ef852f8703da3f622"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-integration-20261008/historical/historical-manifest.json",
+      "sha256": "a49ee94f6d64500cb25c92deb29e63b9ef99d84c8fd705a4974ef7497eefb42d"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-integration-20261008/historical/historical-test-reports-complete.tar.gz",
+      "sha256": "aa6071df52f002de5711522a1cd0b98119f7e545cc6e1fbc791bbb0d0d823ac6"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-integration-20261008/historical/historical-test-reports.tar.gz",
+      "sha256": "3e8b1e9d6925514c6d27f343eb9132e1ad65bc57571c1800fe7d6c27ed997e35"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-integration-20261008/historical/probe/case-files.txt",
+      "sha256": "192326991b15288a05428c5cda61e2b987d8c050cd46554a0aa8e58a9ce54f9c"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-integration-20261008/historical/probe/host-before.json",
+      "sha256": "dfdf6814e97b0c593ea22dcfd286ccfaa303d4e489ca0fe2986dce4ca950cc0f"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-integration-20261008/historical/probe/process-receipt.json",
+      "sha256": "cf2fd59f6f8f1be46b6f724fbae6012ad2d341714fcf91bce4e8af233fd3af3f"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-integration-20261008/historical/probe/records.jsonl",
+      "sha256": "3ca04af318203c10f3784de80c13903a434a26af43a67e1f9114c5a5cc3c8589"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-integration-20261008/historical/probe/server-lifecycle.log.gz",
+      "sha256": "cd0045a713ff42d1b76ff9e93a2b0badf041bd31873e2ef63acb6fedf1011eaa"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-integration-20261008/historical/probe/worker.log.gz",
+      "sha256": "95535217e533151747ec75a9c5dd007abb96c7ef62a8c7a84583ce9a15881ab8"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-integration-20261008/historical/retained-input-sha256.json",
+      "sha256": "080980e11d69fae010e6815feb8481cac3229f98d13edaebfa652ad9d8977fe6"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-integration-20261008/historical-harness.patch",
+      "sha256": "a4ce80469d6fc2a038f77da04312c4eff74951114e5851e967b0d9fb259a7cf4"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-integration-20261008/historical-replay.bundle",
+      "sha256": "b7ac2f603162932532980d2cca006bd16e89d7bec680a5e15fdac3c4ed77d9f4"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-integration-20261008/paired-inventory-proposal.json",
+      "sha256": "b4e5bcebe2cca8719a60c4fb87f0b8ff32d949ff1ebdec88a573c1b11b77d1fa"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-integration-20261008/paired-resource-proposal.md",
+      "sha256": "ed40dd02d46bf3c746f80895f6d1ae402f7f8337efa4e87a95bc7651676a604d"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-integration-20261008/public-pin-mvpa.json",
+      "sha256": "7c417120b832dfeb6320203406cc49555785063e00b4d2954eb629539b125527"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-integration-20261008/public-pin-mvpa.log.gz",
+      "sha256": "550386eae15246d2015507495740f5db44f6deb6eb49449e64ab27a500af4906"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-integration-20261008/public-pin-test-reports.tar.gz",
+      "sha256": "0886222a32083f28388c82412ca615a3b9f736b63baa6049ea47747c98796ca1"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-integration-20261008/public-pin-verification.json",
+      "sha256": "dc6312d7a5cd6bfd7a8bba402ca0a3e15942bbaa1458f2f04f9e3a2896ff7156"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-integration-20261008/publication.json",
+      "sha256": "34134cd0f41cd5149adaa5b5268c29f09729c8bc0fc015bacdb8a8bdd0f22794"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-integration-20261008/resource-summary.json",
+      "sha256": "2eae765254e6e88e4771cec568edf55bcd32c83c53f5aa536e6ba88b951e1dbb"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-integration-20261008/run_gates.py",
+      "sha256": "ca20fd446e0fed813173260efbf468bbf08b2b51f57d32543e933422540c8dee"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-integration-20261008/summarize_resources.py",
+      "sha256": "79fed978f6a96c6ea0c7441659d286a14116ebdf4e7a841f0cc61584923a4e42"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-integration-20261008/upstream-ci.json",
+      "sha256": "9655d7124c0c08aff6f78a1ca5b06dc3dd005521ba061b2b96319d4f978ab4f8"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-integration-20261008/upstream-pr.json",
+      "sha256": "d268df8c5a4751c6446f00db4633a95ef573cb9f373607e50e8b90f2c626a85d"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/README.md",
+      "sha256": "3173ce1b1364af572958ce9e9b4edd70db3c78e882518903d61afcd304bc9ddc"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/consumer-compile-all.json",
+      "sha256": "1dace12a27578b1286a5c8f0e75fbcc0686fda11056432d7126ef345c4db73dd"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/consumer-compile-all.log.gz",
+      "sha256": "7b085a6744f2e77ec2478c1f94363e61bbd6b8900a920bdcd8cfc3aaf24d98d4"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/consumer-final.json",
+      "sha256": "939c9b895cbcb94aa457a186b2fbd07cdb9825b8105e69039dbd58041aa23c79"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/consumer-final.log.gz",
+      "sha256": "71a714844d9098f90a4a1a711730a5fa81a639f828c4b43112c3d471fecaff6b"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/consumer-first.log.gz",
+      "sha256": "d18217db324eb6bee664dbde49f68e8695ae537b2d0595fafdd51a1b90c12650"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/consumer-fourth.json",
+      "sha256": "c119023a1569a0d9510d61745ab0a1eafb9bdc48eea2584f6c1472a6b985e8c2"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/consumer-fourth.log.gz",
+      "sha256": "27c79d930db3362dba2516bba9e05c993fa2eb561028ae5627b67f5fced33998"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/consumer-second.log.gz",
+      "sha256": "c6095726fdf478cff2b0442bef2c7a90421efa80379150344e950b99e7b5c2d7"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/consumer-tests.json",
+      "sha256": "2a99e5007e7abb6dc73f00901b71e61cc5144335ba7f0c91aff380852c4df85e"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/consumer-tests.tar.gz",
+      "sha256": "eb4f08bd7f3c4f7470afe9dc15cf7cf8b73ed8af617390d5324df65f558b4cc8"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/consumer-third.log.gz",
+      "sha256": "e66a8449048c4c102c9264ff0ae92ca25d8bbf42cd58d0a28cbaa35e80d53931"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/execution.json",
+      "sha256": "2cb4cba316347abb4706d65ff229b8a538c2c6d3132a759b617ba85bc37978e8"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/finalize_evidence.py",
+      "sha256": "b4fbd4813e66d069c27f3b0540143f289540c4791e19d3db1db69a81a7d75bd8"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/gale-prerequisite.log.gz",
+      "sha256": "8ad08d1019a5826f89f47fbaf36fe7c59da744203faa6eae2e53ac99c6f371bf"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/generate_probe.R",
+      "sha256": "4a941b3886fe52b5429db13240d4e40b8127372be6272617408d8173d2031ec3"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/host-before-probe.json",
+      "sha256": "68d9063e2c43245ed1c89820143a276bb044a1440957af702668ad19320f449a"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/log-inventory.json",
+      "sha256": "639e70ef8fad20e191bf612aa8aa48d21304808cf429436572abe1fafef19957"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/multivar-api-checks.json",
+      "sha256": "31ffd2082087139b13d468561374de7b461ecacd2212a9e71c53f5eb4e9f50e2"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/multivar-api-checks.log.gz",
+      "sha256": "3eddcdb0c299d8aab2cf30dfeaedaf90ddce9cc84314dfed93eb5841c9ee6c85"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/multivar-edb05de.bundle",
+      "sha256": "2d658c2cf307a35a04836a4740fa3b911bf8a92e1580eee5fbd7b41a9b47fd8a"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/multivar-final-fixture.log.gz",
+      "sha256": "dff1f16d5e35ad46075566250817f43923d887253c41f108bca7e9065b49cf1d"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/multivar-initial.log.gz",
+      "sha256": "327cbff669fa11766aeae6550c673e0e07667e0e0e4aa2d758f4db0f9e0d9ce5"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/multivar-js-smoke.log.gz",
+      "sha256": "1752a1ee4aa24fbbc214d440a2142770bf3c812a867bbcdf0f37c80bc36bd52e"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/multivar-jvm-all.log.gz",
+      "sha256": "7a58635f9291ba50c09f330acfb0c6930861def140defea2e66635c8eb26880c"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/multivar-pr.md",
+      "sha256": "a2e9f2baa063cde82930a917b4dfc03a7b202acc3b1ef08846afc3094a5911bf"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/multivar-rank-first.log.gz",
+      "sha256": "576aeac2d21c63ce44ffdecc8828411ce0b9031ecfc9d3b7f137b1e55ed12683"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/multivar-tests.json",
+      "sha256": "17fbbdfbb9c0cbb0133c4c84f15705999aa16918aaddf87e7828daa3ee12dec5"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/multivar-tests.tar.gz",
+      "sha256": "02855803627ffde35d2dcd2163ef2e3359fa3e1c66c29670aa7c9bf555f27e51"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/prepare_probe.py",
+      "sha256": "371583ab6ace890dea046a7688adc5c59f98903a9e21610a50353e11fe3e445d"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/prior-evidence-check.json",
+      "sha256": "1fccda13813bc54981f0c3ad240552be4430f170f1ea5c719eacba70d0284fa3"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/probe/assignments.tsv",
+      "sha256": "58e56fb4cdf76dd0b10e68facb45266332a810119fda57c1a206a3e482d38936"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/probe/case-files.txt",
+      "sha256": "6a066954e0b34ae415955a2f964071631998d30484e9a498afd6fe1455c0e63c"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/probe/generator.log.gz",
+      "sha256": "c32a8174181d5ae032b1f8def37e44a7081f02ac34fd2c3af2292c6445227ee9"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/probe/host-before.json",
+      "sha256": "e7a9dfca0279d8f5da7e763cdaa89737e8889e7fda8f3c4aebb345969b8ba2bc"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/probe/input-sha256.json",
+      "sha256": "080980e11d69fae010e6815feb8481cac3229f98d13edaebfa652ad9d8977fe6"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/probe/inputs.tar.gz",
+      "sha256": "048b0ac04b3a64a61609b2986db3a18fac231a84d1a5e2c201dad1aa1ea3e567"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/probe/process-receipt.json",
+      "sha256": "512750c4f4f6a6813c5cfa1ab0bbc292bdfae16f7b2f8f177e3eb4e9ed19ff7f"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/probe/records.jsonl",
+      "sha256": "2491ff12d9ac37cece92a4098f32d2431aff7f9285838b35ca548f7c03ce1307"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/probe/worker.log.gz",
+      "sha256": "16e5491fe8a46629f9c62a90352e10fa5263ebb5526d6544837444ab51651893"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/probe-manifest.json",
+      "sha256": "ca0e376e2e15942c99a188a2712c1f0bae5fbfde83cb342881bd98bae47736e5"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/probe-summary.json",
+      "sha256": "6306f9da69bdb2137514736dd93eb7963ce57039069caf62ad01ac6f7de0277f"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/run_consumer.py",
+      "sha256": "ef798cabfafe126de70ea1863017d60679f073c38761ee7c89c90c38dc53fe25"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/run_probe.py",
+      "sha256": "58cd7220db91ed5f9260ef42f53459770d3d3cdf8049943d03fff0e0aac21321"
+    },
+    {
+      "path": "docs/verification/umvpa-rank-v2-20261008/summarize_probe.py",
+      "sha256": "e5bbb1217d5d9e57ca759c78257451ca74a744ab26137b6a85a422366d1214a0"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/README.md",
+      "sha256": "68f053bcc9397f5aeeab2a5a4c06351db6b97f7cb08df9805c4b1f3c61e05738"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/fixture/R-session.txt",
+      "sha256": "cbd4f8441218763e283867b860de33cbd949399f49235c63749599394962fb65"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/fixture/analytic-oracle.tsv",
+      "sha256": "2c9884cb75577eccfb20ce678f5bc1c0b518cbaf578ed1ee47e4c9abd978d1df"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/fixture/fixture-scope.txt",
+      "sha256": "93a6f87867ca20ff2c899311be3a5db7946cef676e9710eece34d8780e359f16"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/fixture/seed-vectors.tsv",
+      "sha256": "75a78e2201643304ae40f32c79d61350c66b88279724acd2e5a08416f0964365"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/fixture-B1999-locked-plan.json",
+      "sha256": "3993441e59a84c180fc29401099ca2c347267cfb8345ecf16d8caefded050e95"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/fixture-B1999-plan.json",
+      "sha256": "736bcf37759550b37f5df10a407775ee611ccf3f39116a601de3b8da129db14a"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/fixture-cost-manifest.json",
+      "sha256": "eef7f5a4dda99eda317bc2f16e659a90bf0c988b4051d8f27d763f57241cfa06"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/fixture-cost-manifest.sha256",
+      "sha256": "43ff99bd59987be5564da9c7bae4f45681a5db4c21f012b139836ce4585f151f"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/handoff.md",
+      "sha256": "5569b2d8b3a684a8c9cb1c708bbcaf60f4f47b6fec21604c6385e87d63ca486b"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/identifier-correction.json",
+      "sha256": "bfbdda48ab6476d0a7a252fd8d0d9f5811404775ad63c8037f381bb647931fdc"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/integration-gates-pre-eof.json",
+      "sha256": "664edf5ea71b6997ef436c5f161401953d3d0c02e28e42cdb49e954d6ea6b68b"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/integration-gates-pre-identifier-repair.json",
+      "sha256": "36f6c65a6b771c88cf863a43d24c53cb8a4751183f3437cb05af9d74ab724450"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/integration-gates-pre-timeout.json",
+      "sha256": "de49af1643591f76408a15df4dd3730afb822a0648e0a3252c065021a9eaad37"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/integration-gates.json",
+      "sha256": "a722a9db8830f89aeb07c4ffafd81027efe4f73a099f69a134f7f56f3dbbe737"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/logs/eof-fixture-gates.log",
+      "sha256": "1efcf7836c95dd87c430421006ca7f59886112fb7337008f3f25b8b663032f90"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/logs/identifier-repair-gates.log",
+      "sha256": "840ffc785d7d88513c646224a1b01c97eb6b444c826b82108c1b5a049577a13a"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/logs/post-timeout-mvpa.log",
+      "sha256": "e3122ac44387d4c4729e3825e01fa91c58a7c40fa7f29c57d2fa543593110891"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/manifest-proposal.json",
+      "sha256": "0e26454a06f800dbbb7e5dbe11c7d7c7f88e0151a5a8575ab041147e45bbed09"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/pilot-R0-plan.json",
+      "sha256": "bda16af491708f022df57e963c04425aea725a2e2aea69103edb121793512e38"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/pilot-R1-plan.json",
+      "sha256": "85b850b2ec37b94a1800dbba83fa12bf60f7beea709662004a2ae6d95d609bcc"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/pilot-R2-plan.json",
+      "sha256": "12415029920b00a5e901d3966beaa6c43d92904722956708947be4a4da9524ba"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/pilot-analysis-R-session.txt",
+      "sha256": "5436416cd1267da0cece2a4ecd466cd69a14d70faa3f56ff42b7bd16d10f9d36"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/pilot-descriptive-counts.tsv",
+      "sha256": "2c11d1ce9ebca03a2b52ed13197e84ff1c89b06976b52880f201994d250c39dc"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/pilot-descriptive-cp.R",
+      "sha256": "d8dc5cc261d1ee88b96625f4f969f48564d3e58a39feffcaf27921f0f017cfc4"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/pilot-descriptive-cp.tsv",
+      "sha256": "4110ca538783cf3682e524c2ca0a893012b1b4698e7f758d660712f11b82f5bd"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/pilot-independent-analysis.py",
+      "sha256": "1562be0c4f3a010165efd14b3385fe18b7ac052b008b7ae2d01ed314ef55a918"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/pilot-inputs-ready.json",
+      "sha256": "b4b3ffc9046e9ac6ddcc54609b30d0f15a40196d4009d4d123b34abde4949d85"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/pilot-manifest.json",
+      "sha256": "afadfa28c5efc9e43d30e447dc3b3d0eeb31aea0990b1e8b6e9482fa3c36fd45"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/pilot-manifest.sha256",
+      "sha256": "8635b67a25d2fc71d89a31d6998a9a7ec26a2f267179fa218dac73bf98f79ab2"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/pilot-summary.json",
+      "sha256": "df3796e1971ef6d554f71434a2a3925d3eecf604c55719d88a185ddeb04de498"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/pilot-summary.md",
+      "sha256": "f9da65f9a2a1ca2aa567bd33cc7c3851bd2d3d69d82f38f6799e255c3e8301c0"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/preconfirmation-metrics.md",
+      "sha256": "38bfa1d9ab3b0395f1ee354de25f6977d80c8c29dc47561badeff7a67dcdece6"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/prepared-pilot-inputs.tar.gz",
+      "sha256": "1a1654ad922797b47a03ee64e9e69cdd53a50318f1cc0f419646063ab35256f4"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/qa-R0/R-session.txt",
+      "sha256": "bdfcd09b1adecb452bd695d8299f93def7eb924c502c7fafef214c5c3ad58078"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/qa-R0/process-receipt.json",
+      "sha256": "54cabd248ca660b03b152b88575ce9548e3d534c107ea474366483e21a8ae424"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/qa-R0/qa-scope.txt",
+      "sha256": "849f09a3fabc414639c80c60e457e3d68c32f086e103982783142ad30c1f8c2b"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/qa-R0/simulator-qa.tsv",
+      "sha256": "f97dc918b74ba2e76cdff5d10eb817e5fd26c328140ddb634a2bbe38c8149e4f"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/qa-R0/worker.log",
+      "sha256": "73e06c43a710144e975f696044fc15b6abc98a508c2d8b9467241fb964c2d8d8"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/qa-R0-plan.json",
+      "sha256": "efc1b860e76290c57ef2e08eb4b2491c13b8a2836002cf929079a88f0889d83e"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/qa-R0-seeds.tsv",
+      "sha256": "625825f04376c23a976ae4784b2fddbbb4a50005eb6ad4b351f2176f4ccc2be7"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/qa-R0-supervised/R-session.txt",
+      "sha256": "bdfcd09b1adecb452bd695d8299f93def7eb924c502c7fafef214c5c3ad58078"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/qa-R0-supervised/process-receipt.json",
+      "sha256": "a1ec5e5811622cf5ebb07e104c164dab016e07030418d20b23797eacfdd37135"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/qa-R0-supervised/qa-scope.txt",
+      "sha256": "849f09a3fabc414639c80c60e457e3d68c32f086e103982783142ad30c1f8c2b"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/qa-R0-supervised/simulator-qa.tsv",
+      "sha256": "edfdf814e7897a954c6e2a14619b856e5973fc75084f53babd3e9f728b6e9193"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/qa-R0-supervised/worker.log",
+      "sha256": "73e06c43a710144e975f696044fc15b6abc98a508c2d8b9467241fb964c2d8d8"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/qa-R1-plan.json",
+      "sha256": "f6c6583043b8ce03d197a84ae68120cfd793f7c4416d801e29156db133ce3878"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/qa-R1-seeds.tsv",
+      "sha256": "279cb7ea283b2b0ce23e19f0afa7be01f24569e9354b772d9038a731add5950c"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/qa-R1-supervised/R-session.txt",
+      "sha256": "bdfcd09b1adecb452bd695d8299f93def7eb924c502c7fafef214c5c3ad58078"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/qa-R1-supervised/process-receipt.json",
+      "sha256": "81d9d73e84ffa346e00aff67e172aa03bf8354df7218f8dbbfcbb92886fa24ce"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/qa-R1-supervised/qa-scope.txt",
+      "sha256": "8d3180e1d6444ecc69e45c3906056b02a81d5208b60b7742f8fac0675dc4ea4b"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/qa-R1-supervised/simulator-qa.tsv",
+      "sha256": "f837bde948b081bd500ed900cbd4b4945e2ad3abd854eb4b71177c974f00f5f3"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/qa-R1-supervised/worker.log",
+      "sha256": "73e06c43a710144e975f696044fc15b6abc98a508c2d8b9467241fb964c2d8d8"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/qa-R2-plan.json",
+      "sha256": "5245f7c2e8e772e83d10517f9bbc628b757a6f43459a46026f9eaafb95271ab4"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/qa-R2-seeds.tsv",
+      "sha256": "03cab0a36a4793eec569ad2824106a95122de2d04616a50400630e022bfa1c41"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/qa-R2-supervised/R-session.txt",
+      "sha256": "bdfcd09b1adecb452bd695d8299f93def7eb924c502c7fafef214c5c3ad58078"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/qa-R2-supervised/process-receipt.json",
+      "sha256": "b6ad6a42c80ec7bca0f8fef48ebef53ed3c2ae1d7cda0ae518d33e0acf5f4cf1"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/qa-R2-supervised/qa-scope.txt",
+      "sha256": "d631692bb76968ae81e96b758da9030b0e9213942d5695778944cb85e84b97c9"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/qa-R2-supervised/simulator-qa.tsv",
+      "sha256": "6ae7e8cfc4531176f6b575338120e8d2bf20b9ce8848d482a2ac7ffcf144f149"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/qa-R2-supervised/worker.log",
+      "sha256": "73e06c43a710144e975f696044fc15b6abc98a508c2d8b9467241fb964c2d8d8"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/qa-manifest-v2.json",
+      "sha256": "59bbecf242e1ad1ebc5eb98b0e74068d5234ea2c217219b60e179422ad39369e"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/qa-manifest-v2.sha256",
+      "sha256": "8c7413d8e2b98d23e626e7b2005e422761bd8094f98b74964b6b68c3c2868d96"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/qa-manifest.json",
+      "sha256": "d1d1f475cba6402796411641ba73ee4e2575af2a0a0e146243eeacb4ccf59ba9"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/qa-manifest.sha256",
+      "sha256": "8330495633358314758cf3a10cdf60d3f499798184b20ece8231c2677602d876"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/qa-parameters.json",
+      "sha256": "9592fd17ce56c1209e75611a3ab90ed0a2470ba9a6e6714a021425de743608e0"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/resource-supervisor-identifier-v2.py",
+      "sha256": "8600dd151b18bd4467de50efd5d4ec512e456eb86923fd9f4a3cf1d14a6ebcd1"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/resource-supervisor.py",
+      "sha256": "12a1976d9ec5925ec858da02418904fac2b73442172fa294d52acb7dad66b9a1"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/run-fixture-B1999-locked/process-receipt.json",
+      "sha256": "d1aba57a64680deef915d75b3f8b86393c1fc0bf2b4192f90d4755c8135bb04f"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/run-fixture-B1999-locked/worker.log",
+      "sha256": "d06aa00a9a536dfb45a12ef8fcc20e15f1d43ccf940e750e8b889e7eeaa4f091"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/run-fixture-B1999-locked-identifier-v2/process-receipt.json",
+      "sha256": "71e5d655287e38dd45c5cdd95c73a216edf8e8ada63d1cd3f58b69948262bd45"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/run-fixture-B1999-locked-identifier-v2/records.jsonl",
+      "sha256": "52805bdf89666158e1d1a8c1133b785d7427ed61194abf59de764a9ac58ea8bb"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/run-fixture-B1999-locked-identifier-v2/worker.log",
+      "sha256": "3b96eb244c0cba48a7645537c6fdbbc28193a8bcb2545bddb73dab77e5e5ee76"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/run-pilot-R0/process-receipt.json",
+      "sha256": "b19858c1b5d75f425d3dabe296895f482812420fb14f3ef73bff5929444a961e"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/run-pilot-R0/records.jsonl",
+      "sha256": "14080d28e07061a39b769b3edb20c1fb69e27624e54e99559749cc62dacab4f1"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/run-pilot-R0/worker.log",
+      "sha256": "a6ff6c109c82053639eeba6e082b20305591bbc2ee4de225a374c522e73a6bda"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/run-pilot-R1/process-receipt.json",
+      "sha256": "0cfd9ae05d647b7f7a7300128e340ed1d65bd2e0de0bb4398d0f6aae5070a42c"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/run-pilot-R1/records.jsonl",
+      "sha256": "e85585b9fa6dc2c1790e684667ef218d8809b6acd2759d688c3e523d293c50ce"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/run-pilot-R1/worker.log",
+      "sha256": "b18522ff9db3fbc78605a756906917b104b971b39553ba5c5921db4baa1b8fbd"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/run-pilot-R2/process-receipt.json",
+      "sha256": "d00d27033221c22688e007b4cd12eee592c73e971eee6d7e977f4ab55f7e6c69"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/run-pilot-R2/records.jsonl",
+      "sha256": "e370fff8ad1ebda57fcf0a3141b5ff3c72f242fdfb1050e0667ed35780508327"
+    },
+    {
+      "path": "docs/verification/umvpa-inference-calibration-20261007/run-pilot-R2/worker.log",
+      "sha256": "e428fb501cd4ebe5388bb9cede5d7b27ca860ea7a1ad90de41d0e88e60c2950f"
+    }
+  ],
+  "wrapper": {
+    "tools/build/sbt-warm": "5460d7caf7a1193e333089769119e731d8bb4caf12b0fb126387677198709d3f",
+    "tools/build/test_sbt_warm.py": "5e90b0209261705c33b2f826cfb522413b5bafca35ed7e24ff012032bc103b89"
+  }
+}
