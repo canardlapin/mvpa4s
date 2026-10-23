@@ -1,0 +1,1 @@
+{"actor":"codex-mvpa-harness-migration","entity":"bd-01M5M5SATYCMQAD09VT4BC7FY3","kind":"reserve_open","mode":"exclusive","op":"20261023T104640.578603Z-p15060-c0000-rf87d-h8c50d1","paths":["tools/build/sbt-warm","tools/build/test_sbt_warm.py"],"reservation_id":"rv-01M5M5XE621YV9JXA48NB616F3","ts":"2026-10-23T10:46:40.578603Z","ttl_s":3600,"v":2}
