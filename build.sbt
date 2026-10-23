@@ -92,7 +92,7 @@ def forwardImagingOverrides(owner: String): Unit =
     sys.props.get(s"mvpa4s.$provider.build").foreach(System.setProperty(s"$owner.$provider.build", _))
   }
 
-lazy val neurosurf4sRevision = "73a244fbe5d7b4db2f0c946d98fa2a3c00101ab7"
+lazy val neurosurf4sRevision = "4b23386bf750118b9c7c1220b6c592da9ba965e0"
 lazy val neurosurf4sBuild = {
   forwardImagingOverrides("neurosurf4s")
   pinned("neurosurf4s", neurosurf4sRevision)
@@ -100,7 +100,7 @@ lazy val neurosurf4sBuild = {
 lazy val neurosurf4sCoreJVM = ProjectRef(neurosurf4sBuild, "coreJVM")
 lazy val neurosurf4sCoreJS = ProjectRef(neurosurf4sBuild, "coreJS")
 
-lazy val neuroatlas4sRevision = "4df875d8a1cd20afd3b83ed49446422bc507e5ec"
+lazy val neuroatlas4sRevision = "0256e98eb78d35523ce6dbd08fea4f19b76e1b68"
 lazy val neuroatlas4sBuild = {
   forwardImagingOverrides("neuroatlas4s")
   pinned("neuroatlas4s", neuroatlas4sRevision)
